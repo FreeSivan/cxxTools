@@ -25,6 +25,7 @@ public:
     void setsize(int size);
     void put(node<T> *val);
     void releaseFree();
+    void releaseFull();
     void resetqueue();
     node<T>* get();
 private:
@@ -60,6 +61,9 @@ inline mtqueue<T>::mtqueue() {
 template <typename T>
 inline mtqueue<T>::~mtqueue() {
     node<T> *p, *q;
+    setflag(1);
+    releaseFree();
+    releaseFull();
     pthread_mutex_lock(&m_lock);
     for (p = m_head; p ; p = q) {
         q = p->m_next;
@@ -113,6 +117,13 @@ inline void mtqueue<T>::releaseFree() {
 }
 
 template <typename T>
+inline void mtqueue<T>::releaseFull() {
+    pthread_mutex_lock(&m_lock);
+    pthread_cond_broadcast(&m_full);
+    pthread_mutex_unlock(&m_lock);
+}
+
+template <typename T>
 inline node<T>* mtqueue<T>::get() {
     node<T> *node;
     pthread_mutex_lock(&m_lock);
@@ -148,8 +159,16 @@ inline void mtqueue<T>::put(node<T> *val) {
     val->m_next = 0;
     pthread_mutex_lock(&m_lock);
     while (m_cursize >= m_maxsize) {
+        if (m_overflag) {
+            pthread_mutex_unlock(&m_lock);
+            return;
+        }
         m_fullwait++;
         pthread_cond_wait(&m_full, &m_lock);
+    }
+    if (m_overflag) {
+        pthread_mutex_unlock(&m_lock);
+        return;
     }
     m_cursize++;
     *m_tail = val;
