@@ -4,6 +4,9 @@
 #define COUNT_SIZE(_K, _V, _L) (sizeof(_K)+sizeof(_V)+(_L)*sizeof(int*))
 #define DEFAULT_LEVEL 5
 
+#include <iostream>
+using namespace std;
+
 template <class K, class V>
 struct skNode {
     K key;
@@ -21,6 +24,7 @@ public:
     bool getValue(K key V& val) const;
     bool addTerm(K key, V val);
     bool delTerm(k key);
+	void display();
 private:
     skNode<K, V>* m_head;
     int m_length;
@@ -28,6 +32,7 @@ private:
 private:
     skList(const skList&);
     skList& operator=(const skList&);
+	int random_level();
 };
 
 template <class K, class V>
@@ -80,7 +85,7 @@ inline bool skList<K, V>::addTerm(K key, V val) {
     if (getValue(key, V())) {
         return false;
     }
-    int level = getlevel();
+    int level = random_level();
     skNode<K, V> *tmp = malloc(COUNT_SIZE(K, V, level));
     tmp->key = key;
     tmp->val = val;
@@ -122,6 +127,28 @@ inline bool skList<K, V>::delTerm(K key) {
         start = p;
     }
     return true;
+}
+
+template <class K, class V>
+inline void skList<K, V>::display() {
+	skNode<K, V>* p;
+	for (int i = m_level - 1; i >= 0; --i) {
+		p = m_head->link[i];
+		while (p) {
+			cout << p->key;
+			p = p->link[i];
+		}
+		cout << endl;
+	}
+}
+
+template <class K, class V>
+inline int skList<K, V>::random_level() {
+	level = 1;
+	while (level < m_level && random(0, 1)) {
+		level++;
+	}
+	return level;
 }
 
 #endif
