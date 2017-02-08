@@ -11,8 +11,8 @@
 
 template <typename T>
 struct node {
-	T m_data;
-	node<T> *m_next;
+    T m_data;
+    node<T> *m_next;
 };
 
 template <typename T>
