@@ -25,7 +25,7 @@ public:
     bool getValue(K key, V& val) const;
     bool addTerm(K key, V val);
     bool delTerm(K key);
-	void display();
+    void display();
 private:
     skNode<K, V>* m_head;
     int m_length;
@@ -33,7 +33,7 @@ private:
 private:
     skList(const skList&);
     skList& operator=(const skList&);
-	int random_level();
+    int random_level();
 };
 
 template <class K, class V>
