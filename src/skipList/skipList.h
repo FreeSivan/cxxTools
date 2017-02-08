@@ -130,24 +130,24 @@ inline bool skList<K, V>::delTerm(K key) {
 
 template <class K, class V>
 inline void skList<K, V>::display() {
-	skNode<K, V>* p;
-	for (int i = m_level - 1; i >= 0; --i) {
-		p = m_head->link[i];
-		while (p) {
-			cout << p->key << "|"<<p->val<<" ";
-			p = p->link[i];
-		}
-		cout << endl;
-	}
+    skNode<K, V>* p;
+    for (int i = m_level - 1; i >= 0; --i) {
+        p = m_head->link[i];
+        while (p) {
+            cout << p->key << "|"<<p->val<<" ";
+            p = p->link[i];
+        }
+        cout << endl;
+    }
 }
 
 template <class K, class V>
 inline int skList<K, V>::random_level() {
-	int level = 1;
-	while (level < m_level && random()%2) {
-		level++;
-	}
-	return level;
+    int level = 1;
+    while (level < m_level && random()%2) {
+        level++;
+    }
+    return level;
 }
 
 #endif
