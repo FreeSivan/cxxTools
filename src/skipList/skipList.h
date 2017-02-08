@@ -13,14 +13,13 @@ template <class K, class V>
 struct skNode {
     K key;
     V val;
-    skNode* link[0];
+    skNode* link[1];
 };
 
 template <class K, class V>
 struct skList {
 public:
-    skList();
-    skList(int level);
+    skList(int level = DEFAULT_LEVEL);
     ~skList();
 public:
     bool getValue(K key, V& val) const;
@@ -38,11 +37,6 @@ private:
 };
 
 template <class K, class V>
-inline skList<K, V>::skList(){
-    skList(DEFAULT_LEVEL);
-}
-
-template <class K, class V>
 inline skList<K, V>::skList(int level){
     m_length = 0;
     m_level = level;
@@ -54,7 +48,6 @@ inline skList<K, V>::skList(int level){
 
 template <class K, class V>
 inline skList<K, V>::~skList() {
-    cout<<"212312312"<<endl;
     skNode<K, V> *tmp = m_head;
     while (m_head) {
         tmp = m_head;
@@ -70,7 +63,7 @@ inline bool skList<K, V>::getValue(K key, V& val) const {
         skNode<K, V>* p = start;
         while (p->link[i]) {
             if (p->link[i]->key == key) {
-                val = p->val;
+                val = p->link[i]->val;
                 return true;
             }
             if (p->link[i]->key > key) {
@@ -99,9 +92,7 @@ inline bool skList<K, V>::addTerm(K key, V val) {
     skNode<K, V>* begin = m_head;
     for (int i = level-1; i >= 0; --i) {
         skNode<K, V>* p = begin;
-        cout<<p<<endl;
         while (p->link[i]) {
-            cout<<p->link[i]->key<<endl;
             if (p->link[i]->key > key) {
                 break;
             }
@@ -118,17 +109,19 @@ inline bool skList<K, V>::addTerm(K key, V val) {
 template <class K, class V>
 inline bool skList<K, V>::delTerm(K key) {
     skNode<K, V>* start = m_head;
-    skNode<K, V>* tmp = m_head;
+    skNode<K, V>* tmp;
     for (int i = m_level-1; i >= 0; --i) {
         skNode<K, V>* p = start;
         while (p->link[i]) {
             if (p->link[i]->key == key) {
                 tmp = p->link[i];
                 p->link[i] = tmp->link[i];
+                break;
             }
             if (p->link[i]->key > key) {
                 break;
             }
+            p = p->link[i];
         }
         start = p;
     }
@@ -141,7 +134,7 @@ inline void skList<K, V>::display() {
 	for (int i = m_level - 1; i >= 0; --i) {
 		p = m_head->link[i];
 		while (p) {
-			cout << p->key;
+			cout << p->key << "|"<<p->val<<" ";
 			p = p->link[i];
 		}
 		cout << endl;
