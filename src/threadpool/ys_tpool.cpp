@@ -79,7 +79,7 @@ void* threadPool::thrRun(void *args) {
         }
         pthread_mutex_unlock(&p->lock);
         //for test
-        //work->args = (void*)pthread_self();
+        work->args = (void*)pthread_self();
         work->routine();
         delete work;
     }

@@ -8,7 +8,6 @@ public:
     virtual ~event();
 public:
     virtual void* routine() = 0;
-    void setArgs(void *args);
 public:
     void* args;
     event* link;
