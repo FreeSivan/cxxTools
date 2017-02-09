@@ -4,16 +4,22 @@
 
 struct event {
 public:
-    event() {};
-    virtual ~event() {};
+    event();
+    virtual ~event();
 public:
     virtual void* routine() = 0;
-private:
+    void setArgs(void *args);
+public:
     void* args;
     event* link;
 private:
     event(const event&);
-    event& operator(const event&);
+    event& operator=(const event&);
+};
+
+struct testEvent : public event {
+public:
+    virtual void* routine();
 };
 
 struct threadPool {
@@ -21,14 +27,17 @@ public:
     threadPool(int thr_num = 10);
     ~threadPool();
 public:
-    bool tp_add_event(event* e);
-    static void* thr_run(void* args);
+    void setOverFlag(int flag);
+    bool tpAddEvent(event* e);
+    static void* thrRun(void* args);
 private:
     event* head;
+    event** tail;
+    int over_flag;
     int max_thr_num;
     pthread_t *thr_id;
-    pthread_conf_t empty;
-    pthread_mutux_t lock;
+    pthread_cond_t empty;
+    pthread_mutex_t lock;
 private:
     threadPool(const threadPool&);
     threadPool& operator=(const threadPool&);
