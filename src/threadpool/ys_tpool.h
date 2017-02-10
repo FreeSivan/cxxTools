@@ -2,6 +2,8 @@
 #define _YS_TPOOL_H_
 #include <pthread.h>
 
+namespace ys {
+
 struct event {
 public:
     event();
@@ -41,5 +43,7 @@ private:
     threadPool(const threadPool&);
     threadPool& operator=(const threadPool&);
 };
+
+}
 
 #endif
