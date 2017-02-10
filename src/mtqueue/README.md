@@ -1,3 +1,4 @@
+
 mt_queue是一个多线程队列
 
 提供方法：
@@ -16,3 +17,4 @@ void releaseFree(); 广播空等待信号，释放所有因队列空无法获取
 
 void resetqueue(); 重置队列
 
+使用方法见main文件
