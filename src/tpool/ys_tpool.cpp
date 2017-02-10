@@ -50,6 +50,7 @@ void* threadPool::thrRun(void *args) {
         //for test
         work->m_data->args = (void*)pthread_self();
         work->m_data->routine();
+        delete work->m_data;
         delete work;
     }
 }
