@@ -9,6 +9,8 @@
 #include <iostream>
 using namespace std;
 
+namespace ys {     // namespace for yue sivan
+
 template <class K, class V>
 struct skNode {
     K key;
@@ -150,5 +152,6 @@ inline int skList<K, V>::random_level() {
     return level;
 }
 
+}
 #endif
 

@@ -1,5 +1,5 @@
 /**
- * auther : xiwen.yxw_104792
+ * auther : yue sivan
  */
 
 #ifndef _TPQUEUE_H_
@@ -9,28 +9,30 @@
 
 #define DEFAULT_SIZE 100
 
+namespace ys {
+
 template <typename T>
-struct node {
+struct mt_node {
     T m_data;
-    node<T> *m_next;
+    mt_node<T> *m_next;
 };
 
 template <typename T>
-struct mtqueue {
+struct mt_queue {
 public:
-    mtqueue();
-    ~mtqueue();
+    mt_queue();
+    ~mt_queue();
 public:
     void setflag(int flag);
     void setsize(int size);
-    void put(node<T> *val);
+    bool put(mt_node<T> *val);
     void releaseFree();
     void releaseFull();
     void resetqueue();
-    node<T>* get();
+    mt_node<T>* get();
 private:
-    node<T> *m_head;
-    node<T> **m_tail;
+    mt_node<T> *m_head;
+    mt_node<T> **m_tail;
     int m_cursize;
     int m_maxsize;
     int m_overflag;
@@ -40,12 +42,12 @@ private:
     pthread_cond_t m_full;
     pthread_mutex_t m_lock;
 private:
-    mtqueue(const mtqueue<T>&);
-    mtqueue<T>& operator=(const mtqueue<T>&);
+    mt_queue(const mt_queue<T>&);
+    mt_queue<T>& operator=(const mt_queue<T>&);
 };
 
 template <typename T>
-inline mtqueue<T>::mtqueue() {
+inline mt_queue<T>::mt_queue() {
     m_head = 0;
     m_tail = &m_head;
     m_cursize = 0;
@@ -59,8 +61,8 @@ inline mtqueue<T>::mtqueue() {
 }
 
 template <typename T>
-inline mtqueue<T>::~mtqueue() {
-    node<T> *p, *q;
+inline mt_queue<T>::~mt_queue() {
+    mt_node<T> *p, *q;
     setflag(1);
     releaseFree();
     releaseFull();
@@ -76,8 +78,8 @@ inline mtqueue<T>::~mtqueue() {
 }
 
 template <typename T>
-inline void mtqueue<T>::resetqueue() {
-    node<T> *p, *q;
+inline void mt_queue<T>::resetqueue() {
+    mt_node<T> *p, *q;
     pthread_mutex_lock(&m_lock);
     for (p = m_head; p; p = q) {
         q = p->m_next;
@@ -94,7 +96,7 @@ inline void mtqueue<T>::resetqueue() {
 }
 
 template <typename T>
-inline void mtqueue<T>::setsize(int size) {
+inline void mt_queue<T>::setsize(int size) {
     pthread_mutex_lock(&m_lock);
     if (size > m_cursize) {
         m_maxsize = size;
@@ -103,29 +105,29 @@ inline void mtqueue<T>::setsize(int size) {
 }
 
 template <typename T>
-inline void mtqueue<T>::setflag(int flag) {
+inline void mt_queue<T>::setflag(int flag) {
     pthread_mutex_lock(&m_lock);
     m_overflag = flag;
     pthread_mutex_unlock(&m_lock);
 }
 
 template <typename T>
-inline void mtqueue<T>::releaseFree() {
+inline void mt_queue<T>::releaseFree() {
     pthread_mutex_lock(&m_lock);
     pthread_cond_broadcast(&m_free);
     pthread_mutex_unlock(&m_lock);
 }
 
 template <typename T>
-inline void mtqueue<T>::releaseFull() {
+inline void mt_queue<T>::releaseFull() {
     pthread_mutex_lock(&m_lock);
     pthread_cond_broadcast(&m_full);
     pthread_mutex_unlock(&m_lock);
 }
 
 template <typename T>
-inline node<T>* mtqueue<T>::get() {
-    node<T> *node;
+inline mt_node<T>* mt_queue<T>::get() {
+    mt_node<T> *node;
     pthread_mutex_lock(&m_lock);
     while (!m_cursize) {
         if (m_overflag) {
@@ -154,21 +156,21 @@ inline node<T>* mtqueue<T>::get() {
 }
 
 template <typename T>
-inline void mtqueue<T>::put(node<T> *val) {
-    if (!val) return;
+inline bool mt_queue<T>::put(mt_node<T> *val) {
+    if (!val) return 0;
     val->m_next = 0;
     pthread_mutex_lock(&m_lock);
     while (m_cursize >= m_maxsize) {
         if (m_overflag) {
             pthread_mutex_unlock(&m_lock);
-            return;
+            return 0;
         }
         m_fullwait++;
         pthread_cond_wait(&m_full, &m_lock);
     }
     if (m_overflag) {
         pthread_mutex_unlock(&m_lock);
-        return;
+        return 1;
     }
     m_cursize++;
     *m_tail = val;
@@ -178,7 +180,9 @@ inline void mtqueue<T>::put(node<T> *val) {
         m_freewait--;
     }
     pthread_mutex_unlock(&m_lock);
+    return 1;
 }
 
+}
 #endif
 

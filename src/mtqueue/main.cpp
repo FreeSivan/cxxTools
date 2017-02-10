@@ -3,16 +3,18 @@
 #include <unistd.h>
 #include "ys_mtqueue.h"
 
+using namespace ys;
+
 typedef struct _testData {
     long data;
 } testData;
 
-mtqueue<testData> pqueue;
+mt_queue<testData> pqueue;
 
 void* thrfunc1(void *arg) {
     while (true) {
         sleep(1);
-        node<testData> *tmp = pqueue.get();
+        mt_node<testData> *tmp = pqueue.get();
         printf ("data = %u\n", tmp->m_data.data);
         delete tmp;
     }    
@@ -21,7 +23,7 @@ void* thrfunc1(void *arg) {
 void* thrfunc2(void *arg) {
     pthread_t pid = pthread_self();
     while (true) {
-        node<testData> *tmp = new node<testData>();
+        mt_node<testData> *tmp = new mt_node<testData>();
         tmp->m_data.data = pid;
         pqueue.put(tmp);
         sleep(10);

@@ -1,6 +1,7 @@
 #include "ys_skipList.h"
 #include <iostream>
 using namespace std;
+using namespace ys;
 
 int main() {
 	skList<int, int> sk(4);
