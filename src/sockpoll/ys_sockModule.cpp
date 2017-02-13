@@ -49,7 +49,7 @@ void sock_module::prepare(struct pollfd *psock, int& nsock) {
         if (p->close) {
             p = p->link;
             continue;
-		}
+        }
         psock[pos].fd = p->sock;
         p->pos = pos;
         psock[pos].events = POLLERR | POLLHUP;
@@ -103,19 +103,17 @@ void sock_module::processC(struct pollfd * psodk) {
                 psodk[cusor->pos].revents & POLLHUP) {
             close (cusor->sock);
             cusor->close = 1;
-		}
+        }
         if (psodk[cusor->pos].revents & POLLIN) {
             cusor->setStateNoRead();
             readEvent event = new readEvent();
             event->args = (void*)cusor;
-            // TODO
-		}
+        }
         if (psodk[cusor->pos].revents & POLLOUT) {
             cusor->setStateNoWrite();
             writeEvent event = new writeEvent();
             event->args = (void*)cusor;
-            // TODO
-            }
+        }
         cusor = cusor->link;
     }
 
