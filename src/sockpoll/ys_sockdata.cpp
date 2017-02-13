@@ -3,7 +3,7 @@
 namespace ys {
 
 connect_meta::connect_meta() {
-	pthread_init_mutex(&lock);
+    pthread_init_mutex(&lock);
 }
 
 connect_meta::~connect_meta() {
