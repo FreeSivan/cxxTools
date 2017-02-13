@@ -22,6 +22,8 @@ private:
 private:
     sock_module(const sock_module&);
     sock_module& operator=(const sock_module&);
+	void processL(struct pollfd *psock);
+	void processC(struct pollfd *psodk);
 };
 
 }

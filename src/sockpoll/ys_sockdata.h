@@ -8,21 +8,31 @@
 
 namespace ys {
 
-enum {
-    YS_CLOSE,
-    YS_READ,
-    YS_WRITE
-}
+static const unsigned int YS_SOCK_CANREAD = 1 << 0;
+static const unsigned int YS_SOCK_CANWRITE = 1 << 1;
 
 struct listen_meta {
     int sock;
     int pos;
-    int state;
+    int close;
 };
 
 struct connect_meta : public listen_meta {
-    pthread_mutex_t lock;
+public:
+	connect_meta();
+	~connect_meta();
+private:
+	pthread_mutex_t lock;
+public:
+	int state;
     connect_meta* link;
+public:
+	void setStateCanRead();
+	void setStateNoRead();
+	void setStateCanWrite();
+	void setStateNoWrite();
+	bool getStateCanRead();
+	bool getStateCanWrite();
 };
 
 struct readEvent : public event {

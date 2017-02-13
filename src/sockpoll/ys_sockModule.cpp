@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <string.h>
 
+namespace ys {
+
 sock_module::sock_module(char* host, int port) {
     struct sockaddr_in local;
     bzero(&local, sizeof(local));
@@ -44,37 +46,93 @@ void sock_module::prepare(struct pollfd *psock, int& nsock) {
         psock[pos++].events = POLLIN;
     }
     while (p) {
-        pthread_mutex_lock(&p->lock);
-        if (!p->close) {
-            psock[pos].fd = p->sock;
-            p->pos = pos;
-            psock[pos++].events = POLLIN | POLLOUT | POLLERR | POLLHUP;
-        }
-        pthread_mutex_unlock(&p->lock);
+        if (p->close) {
+			p = p->link;
+			continue;
+		}
+		psock[pos].fd = p->sock;
+        p->pos = pos;
+        psock[pos].events = POLLERR | POLLHUP;
+		pthread_mutex_lock(&p->lock);
+		if (p->getStateCanRead()) {
+			psock[pos].events |= POLLIN;
+		}
+		if (p->getStateCanWrite()) {
+			psock[pos].events |= POLLOUT;
+		}
+		pos ++;
         p = p->link;
     }
     nsock = pos;
 }
 
 void sock_module::process(struct pollfd *psock) {
-    if (listen.pos >= 0 && psock[listen.pos] & POLLIN) {
-        int dsock = accept(listen.sock, (struct sockaddr*)0, 0);
-        if (dsock < 0) {
-            printf ("error!\n");
-        }
-        else {
-            connect_meta* tmp = new connect_meta();
-            tmp->sock = dsock;
-            tmp->pos = -1;
-            tmp->close = 0;
-            pthread_mutix_init(&tmp->lock);
-            tmp->link = connList;
-            connList->link = tmp;
-        }
+	processL(psock);
+	processC(psock);
+}
+
+void sock_module::processL(struct pollfd * psock) {
+	if (listen.pos < 0 || !(psock[listen.pos] & POLLIN)) {
+		return;
+	}
+    int dsock = accept(listen.sock, (struct sockaddr*)0, 0);
+    if (dsock < 0) {
+        printf ("error!\n");
     }
-    while (p) {
-        
+    else {
+        connect_meta* tmp = new connect_meta();
+        tmp->sock = dsock;
+        tmp->pos = -1;
+		tmp->close = 0;
+		tmp->state = 0;
+		tmp->setStateCanRead();
+		tmp->setStateCanWrite();
+        tmp->link = connList;
+        connList->link = tmp;
     }
+}
+
+void sock_module::processC(struct pollfd * psodk) {
+	connect_meta *cusor = connList;
+	while (cusor) {
+		if (cusor->pos < 0) {
+			cusor = cusor->link;
+			continue;
+		}
+		if (psodk[cusor->pos].revents & POLLERR ||
+			psodk[cusor->pos].revents & POLLHUP) {
+			close (cusor->sock);
+			cusor->close = 1;
+		}
+		if (psodk[cusor->pos].revents
+		if (psodk[cusor->pos].revents & POLLIN) {
+			cusor->setStateNoRead();
+			readEvent event = new readEvent();
+			event->args = (void*)cusor;
+			// TODO
+		}
+		if (psodk[cusor->pos].revents & POLLOUT) {
+			cusor->setStateNoWrite();
+			writeEvent event = new writeEvent();
+			event->args = (void*)cusor;
+			// TODO
+		}
+		cusor = cusor->link;
+	}
+
+	connect_meta **delcusor = connList;
+	while (*delcusor) {
+		if (1 == (*delcusor)->close) {
+			connect_meta *tmp = *delcusor;
+			*delcusor = (*delcusor)->link;
+			delete tmp;
+		}
+		else {
+			delcusor = &(*delcusor)->link;
+		}
+	}
+}
+
 }
 
 
