@@ -9,7 +9,7 @@ namespace ys {
 
 class sock_module {
 public:
-    sock_module();
+    sock_module(char* host, int port);
     ~sock_module();
 public:
     void prepare(struct pollfd *psock, int& nsock);

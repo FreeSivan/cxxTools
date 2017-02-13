@@ -3,7 +3,7 @@
 #include <unistd.h>
 using namespace std;
 
-namespace ys { //namespace for yue sivan
+namespace ys {
 
 // abstract event
 event::event() {}

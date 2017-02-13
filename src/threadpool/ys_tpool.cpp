@@ -2,7 +2,8 @@
 #include <iostream>
 #include <unistd.h>
 using namespace std;
-using namespace ys;
+namespace ys {
+     
 // abstract event
 event::event() { link = 0; }
 event::~event() {}
@@ -84,6 +85,10 @@ void* threadPool::thrRun(void *args) {
         delete work;
     }
 }
+
+}
+
+using namespace ys;
 
 // test code
 int main() {

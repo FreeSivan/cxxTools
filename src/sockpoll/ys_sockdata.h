@@ -8,13 +8,20 @@
 
 namespace ys {
 
+enum {
+    YS_CLOSE,
+    YS_READ,
+    YS_WRITE
+}
+
 struct listen_meta {
     int sock;
     int pos;
-    int close;
+    int state;
 };
 
 struct connect_meta : public listen_meta {
+    pthread_mutex_t lock;
     connect_meta* link;
 };
 
