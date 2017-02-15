@@ -94,31 +94,31 @@ void sock_module::processL(struct pollfd * psock) {
 }
 
 void sock_module::processC(struct pollfd * psodk) {
-	connect_meta *cusor = connList;
-	while (cusor) {
-		if (cusor->pos < 0) {
-			cusor = cusor->link;
-			continue;
-		}
-		if (psodk[cusor->pos].revents & POLLERR ||
-			psodk[cusor->pos].revents & POLLHUP) {
-			close (cusor->sock);
-			cusor->close = 1;
-		}
-		if (psodk[cusor->pos].revents & POLLIN) {
-			cusor->setStateNoRead();
-			readEvent event = new readEvent();
-			event->args = (void*)cusor;
-			executePool.tpAddEvent(event);
-		}
-		if (psodk[cusor->pos].revents & POLLOUT) {
-			cusor->setStateNoWrite();
-			writeEvent event = new writeEvent();
-			event->args = (void*)cusor;
-			executePool.tpAddEvent(event);
-		}
-		cusor = cusor->link;
-	}
+    connect_meta *cusor = connList;
+    while (cusor) {
+        if (cusor->pos < 0) {
+            cusor = cusor->link;
+            continue;
+        }
+        if (psodk[cusor->pos].revents & POLLERR ||
+            psodk[cusor->pos].revents & POLLHUP) {
+            close (cusor->sock);
+            cusor->close = 1;
+        }
+        if (psodk[cusor->pos].revents & POLLIN) {
+            cusor->setStateNoRead();
+            readEvent event = new readEvent();
+            event->args = (void*)cusor;
+            executePool.tpAddEvent(event);
+        }
+        if (psodk[cusor->pos].revents & POLLOUT) {
+            cusor->setStateNoWrite();
+            writeEvent event = new writeEvent();
+            event->args = (void*)cusor;
+            executePool.tpAddEvent(event);
+        }
+        cusor = cusor->link;
+    }
 
     connect_meta **delcusor = connList;
     while (*delcusor) {
