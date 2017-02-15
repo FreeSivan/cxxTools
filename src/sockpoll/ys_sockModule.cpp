@@ -94,7 +94,6 @@ void sock_module::processL(struct pollfd * psock) {
 }
 
 void sock_module::processC(struct pollfd * psodk) {
-<<<<<<< HEAD
 	connect_meta *cusor = connList;
 	while (cusor) {
 		if (cusor->pos < 0) {
@@ -120,31 +119,6 @@ void sock_module::processC(struct pollfd * psodk) {
 		}
 		cusor = cusor->link;
 	}
-=======
-    connect_meta *cusor = connList;
-    while (cusor) {
-        if (cusor->pos < 0) {
-            cusor = cusor->link;
-            continue;
-        }
-        if (psodk[cusor->pos].revents & POLLERR ||
-                psodk[cusor->pos].revents & POLLHUP) {
-            close (cusor->sock);
-            cusor->close = 1;
-        }
-        if (psodk[cusor->pos].revents & POLLIN) {
-            cusor->setStateNoRead();
-            readEvent event = new readEvent();
-            event->args = (void*)cusor;
-        }
-        if (psodk[cusor->pos].revents & POLLOUT) {
-            cusor->setStateNoWrite();
-            writeEvent event = new writeEvent();
-            event->args = (void*)cusor;
-        }
-        cusor = cusor->link;
-    }
->>>>>>> 42adbaba8f24e950de482e5dff7d9500d670cdcd
 
     connect_meta **delcusor = connList;
     while (*delcusor) {
