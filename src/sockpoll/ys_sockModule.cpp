@@ -48,34 +48,34 @@ void sock_module::prepare(struct pollfd *psock, int& nsock) {
     }
     while (p) {
         if (p->close) {
-			p = p->link;
-			continue;
-		}
-		psock[pos].fd = p->sock;
+            p = p->link;
+            continue;
+        }
+        psock[pos].fd = p->sock;
         p->pos = pos;
         psock[pos].events = POLLERR | POLLHUP;
-		pthread_mutex_lock(&p->lock);
-		if (p->getStateCanRead()) {
-			psock[pos].events |= POLLIN;
-		}
-		if (p->getStateCanWrite()) {
-			psock[pos].events |= POLLOUT;
-		}
-		pos ++;
+        pthread_mutex_lock(&p->lock);
+        if (p->getStateCanRead()) {
+            psock[pos].events |= POLLIN;
+        }
+        if (p->getStateCanWrite()) {
+            psock[pos].events |= POLLOUT;
+        }
+        pos ++;
         p = p->link;
     }
     nsock = pos;
 }
 
 void sock_module::process(struct pollfd *psock) {
-	processL(psock);
-	processC(psock);
+    processL(psock);
+    processC(psock);
 }
 
 void sock_module::processL(struct pollfd * psock) {
-	if (listen.pos < 0 || !(psock[listen.pos] & POLLIN)) {
-		return;
-	}
+    if (listen.pos < 0 || !(psock[listen.pos] & POLLIN)) {
+        return;
+    }
     int dsock = accept(listen.sock, (struct sockaddr*)0, 0);
     if (dsock < 0) {
         printf ("error!\n");
@@ -84,16 +84,17 @@ void sock_module::processL(struct pollfd * psock) {
         connect_meta* tmp = new connect_meta();
         tmp->sock = dsock;
         tmp->pos = -1;
-		tmp->close = 0;
-		tmp->state = 0;
-		tmp->setStateCanRead();
-		tmp->setStateCanWrite();
+        tmp->close = 0;
+        tmp->state = 0;
+        tmp->setStateCanRead();
+        tmp->setStateCanWrite();
         tmp->link = connList;
         connList->link = tmp;
     }
 }
 
 void sock_module::processC(struct pollfd * psodk) {
+<<<<<<< HEAD
 	connect_meta *cusor = connList;
 	while (cusor) {
 		if (cusor->pos < 0) {
@@ -119,18 +120,43 @@ void sock_module::processC(struct pollfd * psodk) {
 		}
 		cusor = cusor->link;
 	}
+=======
+    connect_meta *cusor = connList;
+    while (cusor) {
+        if (cusor->pos < 0) {
+            cusor = cusor->link;
+            continue;
+        }
+        if (psodk[cusor->pos].revents & POLLERR ||
+                psodk[cusor->pos].revents & POLLHUP) {
+            close (cusor->sock);
+            cusor->close = 1;
+        }
+        if (psodk[cusor->pos].revents & POLLIN) {
+            cusor->setStateNoRead();
+            readEvent event = new readEvent();
+            event->args = (void*)cusor;
+        }
+        if (psodk[cusor->pos].revents & POLLOUT) {
+            cusor->setStateNoWrite();
+            writeEvent event = new writeEvent();
+            event->args = (void*)cusor;
+        }
+        cusor = cusor->link;
+    }
+>>>>>>> 42adbaba8f24e950de482e5dff7d9500d670cdcd
 
-	connect_meta **delcusor = connList;
-	while (*delcusor) {
-		if (1 == (*delcusor)->close) {
-			connect_meta *tmp = *delcusor;
-			*delcusor = (*delcusor)->link;
-			delete tmp;
-		}
-		else {
-			delcusor = &(*delcusor)->link;
-		}
-	}
+    connect_meta **delcusor = connList;
+    while (*delcusor) {
+        if (1 == (*delcusor)->close) {
+            connect_meta *tmp = *delcusor;
+            *delcusor = (*delcusor)->link;
+            delete tmp;
+        }
+        else {
+            delcusor = &(*delcusor)->link;
+        }
+    }
 }
 
 }

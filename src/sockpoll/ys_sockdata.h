@@ -19,20 +19,20 @@ struct listen_meta {
 
 struct connect_meta : public listen_meta {
 public:
-	connect_meta();
-	~connect_meta();
+    connect_meta();
+    ~connect_meta();
 private:
-	pthread_mutex_t lock;
+    pthread_mutex_t lock;
 public:
-	int state;
+    int state;
     connect_meta* link;
 public:
-	void setStateCanRead();
-	void setStateNoRead();
-	void setStateCanWrite();
-	void setStateNoWrite();
-	bool getStateCanRead();
-	bool getStateCanWrite();
+    void setStateCanRead();
+    void setStateNoRead();
+    void setStateCanWrite();
+    void setStateNoWrite();
+    bool getStateCanRead();
+    bool getStateCanWrite();
 };
 
 struct readEvent : public event {
