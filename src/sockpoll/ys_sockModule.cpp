@@ -31,7 +31,7 @@ sock_module::sock_module(char* host, int port) {
     listen.pos = -1;
     listen.close = 0;
     connList = 0;
-	link = 0;
+    link = 0;
 }
 
 sock_module::~sock_module() {
