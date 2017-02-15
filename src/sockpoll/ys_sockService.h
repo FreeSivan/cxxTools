@@ -7,6 +7,8 @@
 
 namespace ys {
 
+#define MAX_SIZE 5000
+
 class sock_service {
 public:
     sock_service();
@@ -18,7 +20,7 @@ public:
 private:
     sock_module* moduleList;
     struct pollfd* pollArr;
-    int possArrSize;
+    int pollArrSize;
 private:
     sock_service(const sock_service&);
     sock_service& operator=(const sock_service&);

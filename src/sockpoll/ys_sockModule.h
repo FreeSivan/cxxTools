@@ -17,8 +17,8 @@ public:
 private:
     listen_meta listen;
     connect_meta* connList;
-    threadPool readPool;
-    threadPool writePool;
+	sock_module* link;
+    threadPool executePool;
 private:
     sock_module(const sock_module&);
     sock_module& operator=(const sock_module&);

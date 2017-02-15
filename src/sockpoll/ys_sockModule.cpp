@@ -31,6 +31,7 @@ sock_module::sock_module(char* host, int port) {
     listen.pos = -1;
     listen.close = 0;
     connList = 0;
+	link = 0;
 }
 
 sock_module::~sock_module() {
@@ -104,18 +105,17 @@ void sock_module::processC(struct pollfd * psodk) {
 			close (cusor->sock);
 			cusor->close = 1;
 		}
-		if (psodk[cusor->pos].revents
 		if (psodk[cusor->pos].revents & POLLIN) {
 			cusor->setStateNoRead();
 			readEvent event = new readEvent();
 			event->args = (void*)cusor;
-			// TODO
+			executePool.tpAddEvent(event);
 		}
 		if (psodk[cusor->pos].revents & POLLOUT) {
 			cusor->setStateNoWrite();
 			writeEvent event = new writeEvent();
 			event->args = (void*)cusor;
-			// TODO
+			executePool.tpAddEvent(event);
 		}
 		cusor = cusor->link;
 	}

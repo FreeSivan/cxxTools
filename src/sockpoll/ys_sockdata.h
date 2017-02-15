@@ -41,6 +41,7 @@ public:
 };
 
 struct writeEvent : public event {
+public:
     virtual void* routine();
 };
 
