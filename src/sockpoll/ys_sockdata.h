@@ -23,16 +23,12 @@ public:
     ~connect_meta();
 private:
     pthread_mutex_t lock;
-public:
     int state;
+public:
     connect_meta* link;
 public:
-    void setStateCanRead();
-    void setStateNoRead();
-    void setStateCanWrite();
-    void setStateNoWrite();
-    bool getStateCanRead();
-    bool getStateCanWrite();
+    void setState(int stat);
+	int getState()const;
 };
 
 struct readEvent : public event {

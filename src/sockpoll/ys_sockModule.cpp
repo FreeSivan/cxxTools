@@ -55,14 +55,14 @@ void sock_module::prepare(struct pollfd *psock, int& nsock) {
         p->pos = pos;
         psock[pos].events = POLLERR | POLLHUP;
         pthread_mutex_lock(&p->lock);
-        if (p->getStateCanRead()) {
+        if (0 == p->getState()) {
             psock[pos].events |= POLLIN;
         }
-        if (p->getStateCanWrite()) {
+        if (4 = p->getState()) {
             psock[pos].events |= POLLOUT;
         }
-        pos ++;
-        p = p->link;
+        pos ++;        
+		p = p->link;
     }
     nsock = pos;
 }
@@ -105,14 +105,14 @@ void sock_module::processC(struct pollfd * psodk) {
             close (cusor->sock);
             cusor->close = 1;
         }
-        if (psodk[cusor->pos].revents & POLLIN) {
-            cusor->setStateNoRead();
+        if (psodk[cusor->pos].revents & POLLIN && 0 == cusor->getState()) {
+            cusor->setState(1);
             readEvent event = new readEvent();
             event->args = (void*)cusor;
             executePool.tpAddEvent(event);
         }
-        if (psodk[cusor->pos].revents & POLLOUT) {
-            cusor->setStateNoWrite();
+        if (psodk[cusor->pos].revents & POLLOUT && 4 == cusor->getState()) {
+            cusor->setState(5);
             writeEvent event = new writeEvent();
             event->args = (void*)cusor;
             executePool.tpAddEvent(event);

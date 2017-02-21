@@ -9,7 +9,13 @@ sock_service::sock_service() {
 }
 
 sock_service::~sock_service() {
-
+	sock_module *tmp = moduleList;
+	while(moduleList) {
+		sock_module *tmp = moduleList;
+		moduleList = moduleList->link;
+		delete tmp;
+	}
+	delete[] pollArr;
 }
 
 bool sock_service::addModule(sock_module * module) {
@@ -31,7 +37,7 @@ bool sock_service::delModule(sock_module* module) {
         }
         cusor = cusor->link;
     }
-    return false;;
+    return false;
 }
 
 void sock_service::mainloop() {
@@ -50,5 +56,18 @@ void sock_service::mainloop() {
     }
 }
 
+}
+
+using namespace ys;
+
+int main() {
+	sock_module* module1 = new sock_module("127.0.0.1", 5001);
+	sock_module* module2 = new sock_module("127.0.0.1", 5002);
+	sock_module* module3 = new sock_module("127.0.0.1", 5003);
+	sock_service service;
+	service.addModule(module1);
+	service.addModule(module2);
+	service.addModule(module3);
+	service.mainloop();
 }
 

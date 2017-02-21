@@ -4,6 +4,7 @@
 #ifndef _SOCK_SERVICE_H_
 #define _SOCK_SERVICE_H_
 #include "sockModule.h"
+#include <poll.h>
 
 namespace ys {
 

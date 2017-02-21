@@ -10,10 +10,10 @@ namespace ys {
 class sock_module {
 public:
     sock_module(char* host, int port);
-    ~sock_module();
+    virtual ~sock_module();
 public:
-    void prepare(struct pollfd *psock, int& nsock);
-    void process(struct pollfd *psock);
+    virtual void prepare(struct pollfd *psock, int& nsock);
+    virtual void process(struct pollfd *psock);
 private:
     listen_meta listen;
     connect_meta* connList;

@@ -10,48 +10,31 @@ connect_meta::~connect_meta() {
     pthread_destroy_mutex(&lock);
 }
 
-void connect_meta::setStateCanRead() {
+void connect_meta::setState(int stat) {
     pthread_mutex_lock(lock);
-    state |= YS_SOCK_CANREAD;
+    state = stat;
     pthread_mutex_unlock(lock);
 }
 
-void connect_meta::setStateNoRead() {
+int connect_meta::getState()const {
     pthread_mutex_lock(lock);
-    state &= ~YS_SOCK_CANREAD;
+    int stat = state 
     pthread_mutex_unlock(lock);
-}
-
-void connect_meta::setStateCanWrite() {
-    pthread_mutex_lock(lock);
-    state |= YS_SOCK_CANWRITE;
-    pthread_mutex_unlock(lock);
-}
-
-void connect_meta::setStateNoWrite() {
-    pthread_mutex_lock(lock);
-    state &= ~YS_SOCK_CANWRITE;
-    pthread_mutex_unlock(lock);
-}
-
-bool connect_meta::getStateCanRead() {
-    pthread_mutex_lock(lock);
-    int ret = state & YS_SOCK_CANREAD;
-    pthread_mutex_unlock(lock);
-    return ret;
-}
-
-bool connect_meta::getStateCanWrite() {
-    pthread_mutex_lock(lock);
-    int ret = state & YS_SOCK_CANWRITE;
-    pthread_mutex_unlock(lock);
-    return ret;
+    return stat;
 }
 
 void* readEvent::routine() {
+	connect_meta* p = (connect_meta*)args;
+	// p->sock;
+	cout<<""<<endl;
+	p->setState(4);
 }
 
 void* writeEvent::routine() {
+	connect_meta* p = (connect_meta*)args;
+	// p->sock;
+	cout<<""<<endl;
+	p->setState(0);
 }
 
 }
