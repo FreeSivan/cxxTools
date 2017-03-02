@@ -16,6 +16,7 @@ public:
     void push_back(T val);
     void push_back(T *val, int size);
     T& operator[](long index);
+    long getCurLen() const;
 private:
     T** data;                                   
     long curLen;                   
@@ -116,6 +117,10 @@ inline void dataPool<T>::resize() {
     data = tmpData;
 }
 
+template <typename T>
+inline long dataPool<T>::getCurLen() const{
+    return curLen;
+}
 }
 
 #endif

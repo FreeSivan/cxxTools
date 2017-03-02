@@ -4,7 +4,7 @@
 using namespace ys;
 
 int main() {
-    dataPool<unsigned int> intpool(2, 3);
+    dataPool<unsigned int> intpool(10, 1000);
     //intpool.push_back(1);
     //intpool.push_back(2);
     //intpool.push_back(3);
@@ -17,7 +17,16 @@ int main() {
 
     intpool.push_back(arr, sizeof(arr)/sizeof(int));
 
-    for (int i = 0; i < sizeof(arr)/sizeof(int); ++i) {
+    for (int i = 0; i < intpool.getCurLen(); ++i) {
+        printf ("%u\n", intpool[i]);
+    }
+
+    for (int i = 0; i < 10000000; ++i) {
+        intpool.push_back(i);
+    }
+    printf ("size = %d\n", intpool.getCurLen());
+
+    for (int i = 0; i < intpool.getCurLen(); ++i) {
         printf ("%u\n", intpool[i]);
     }
 
