@@ -3,18 +3,22 @@
 
 namespace ys {
 
-#define T_LENGTH ((unsigned long)(1 << 10))
-#define S_LENGTH ((unsigned long)(1 << 25))
-#define F_LENGTH ((unsigned long)((unsigned int)1 << 31))
+#define T_LENGTH (1 << 10)
+#define S_LENGTH (1 << 25)
+#define F_LENGTH ((unsigned int)1 << 31)
 
 class phash {
+public:
+    typedef unsigned int uint32;
+    typedef unsigned short uint16;
+    typedef unsigned long uint64;
 public:
     phash();
     ~phash();
 public:
     void addOver();
-    long getpHash(unsigned int key);
-    void addphKey(unsigned int key, int length);
+    long getpHash(uint32 key);
+    void addphKey(uint32 key, int length);
 private:
     unsigned short *first;
     unsigned int *second;
@@ -26,7 +30,7 @@ private:
 private:
     phash(const phash&);
     phash& operator=(const phash&);
-    void generate(unsigned int key);
+    void generate(uint32 key);
 };
 
 }

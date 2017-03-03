@@ -5,9 +5,9 @@
 namespace ys {
 
 phash::phash() {
-    first = new unsigned short[F_LENGTH];
-    second = new unsigned int[S_LENGTH];
-    third = new unsigned long[T_LENGTH];
+    first = new uint16[F_LENGTH];
+    second = new uint32[S_LENGTH];
+    third = new uint64[T_LENGTH];
     foffset = soffset = toffset = lastKey = 0;
 }
 
@@ -17,16 +17,16 @@ phash::~phash() {
     delete[] third;
 }
 
-long phash::getpHash(unsigned int key) {
+long phash::getpHash(uint32 key) {
     int i1 = key >> 21;
     int i2 = key >> 6;
     int i3 = key;
     return first[i3]+second[i2]+third[i1];
 }
 
-void phash::addphKey(unsigned int key, int length) {
+void phash::addphKey(uint32 key, int length) {
     if (lastKey+1 < key) {
-        unsigned int i = lastKey+1;
+        uint32 i = lastKey+1;
         for (; i < key; ++i) {
             generate(i);
         }    
@@ -40,12 +40,9 @@ void phash::addOver() {
     for (int i = lastKey+1; i < F_LENGTH; ++i) {
         addphKey(i, 0);
     }
-    for (int i = 0; i < T_LENGTH; ++i) {
-        printf ("%ld\n", third[i]);
-    }
 }
 
-void phash::generate(unsigned int key) {
+void phash::generate(uint32 key) {
     if (lastKey >> 21 != key >> 21) {
         toffset += soffset;
         third[key>>21] = toffset;
