@@ -1,25 +1,29 @@
-#include "phash.h"
-
+#include "ys_phash.h"
+#include <string.h>
+#include <stdio.h>
+#include <malloc.h>
 namespace ys {
 
 phash::phash() {
-    first = new unsigned short[F_LENGTH];
-    second = new unsigned int[S_LENGTH];
-    third = new unsigned long[T_LENGTH];
+    long long size = (unsigned long)(sizeof(short)*((unsigned long)F_LENGTH));
+    printf ("size = %lld\n", size);
+    first = (unsigned short*)malloc(size);
+    second = (unsigned int*)malloc(sizeof(int)*S_LENGTH);
+    third = (unsigned long*)malloc(sizeof(long)*T_LENGTH);
     foffset = soffset = toffset = lastKey = 0;
 }
 
 phash::~phash() {
-    delete[] first;
-    delete[] second;
-    delete[] third;
+    free(first);
+    free(second);
+    free(third);
 }
 
 long phash::getpHash(unsigned int key) {
     int i1 = key >> 21;
     int i2 = key >> 6;
     int i3 = key;
-    return first[i1]+second[i2]+third[i3];
+    return first[i3]+second[i2]+third[i1];
 }
 
 void phash::addphKey(unsigned int key, int length) {
@@ -35,26 +39,51 @@ void phash::addphKey(unsigned int key, int length) {
 }
 
 void phash::addOver() {
+    printf ("----\n");
     int key = lastKey + 1;
+    if (key < 0) {
+        return;
+    }
+    generate(key++);
+    if (key < 0) {
+        return;
+    }
     int i1 = key >> 21;
     int i2 = key >> 6;
     int i3 = key;
-    memset(first+i1, 0, sizeof(int)*(F_LENGTH-i1));
+    memset(first+i3, 0, sizeof(short)*(F_LENGTH-i3));
     memset(second+i2, 0, sizeof(int)*(S_LENGTH-i2));
-    memset(third+i3, 0, sizeof(int)*(F_LENGTH-i3));
+    memset(third+i1, 0, sizeof(long)*(T_LENGTH-i1));
 }
 
 void phash::generate(unsigned int key) {
-    if (lastKey >> 21 != key >> 21) {
-        third[key>>21] += soffset;
-        soffset = 0;
-    }
     if (lastKey >> 6 != key >> 6) {
-        second[k>>6] += foffset;
+        soffset += foffset;
+        second[key>>6] = soffset;
         foffset = 0;
+    }
+    if (lastKey >> 21 != key >> 21) {
+        toffset += soffset;
+        third[key>>21] = toffset;
+        soffset = 0;
     }
     first[key] = foffset;
 }
 
 }
 
+using namespace ys;
+
+int main() {
+    phash hashtable;
+    unsigned long length = (unsigned int)1 << 31;
+    for (unsigned long i = 0; i < length; i+=4) {
+        hashtable.addphKey(i, 50);
+    }
+    hashtable.addOver();
+    for (unsigned long i = 0; i < length; i+=4) {
+        long offset = hashtable.getpHash(i);
+        printf ("%d offset = %d\n",i, offset);
+    }
+    return 0;
+}

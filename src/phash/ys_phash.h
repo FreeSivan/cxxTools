@@ -3,9 +3,9 @@
 
 namespace ys {
 
-#define T_LENGTH (1 << 10)
-#define S_LENGTH (1 << 25)
-#define F_LENGTH (1 << 31)
+#define T_LENGTH ((unsigned long)(1 << 10))
+#define S_LENGTH ((unsigned long)(1 << 25))
+#define F_LENGTH ((unsigned long)((unsigned int)1 << 31))
 
 class phash {
 public:
@@ -26,7 +26,7 @@ private:
 private:
     phash(const phash&);
     phash& operator=(const phash&);
-    void generate(unsigned int key, int length);
+    void generate(unsigned int key);
 };
 
 }
