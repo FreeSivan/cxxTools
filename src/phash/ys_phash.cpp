@@ -1,23 +1,20 @@
 #include "ys_phash.h"
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <assert.h>
 namespace ys {
 
 phash::phash() {
-    long long size = (unsigned long)(sizeof(short)*((unsigned long)F_LENGTH));
-    printf ("size = %lld\n", size);
-    first = (unsigned short*)malloc(size);
-    second = (unsigned int*)malloc(sizeof(int)*S_LENGTH);
-    third = (unsigned long*)malloc(sizeof(long)*T_LENGTH);
+    first = new unsigned short[F_LENGTH];
+    second = new unsigned int[S_LENGTH];
+    third = new unsigned long[T_LENGTH];
     foffset = soffset = toffset = lastKey = 0;
 }
 
 phash::~phash() {
-    free(first);
-    free(second);
-    free(third);
+    delete[] first;
+    delete[] second;
+    delete[] third;
 }
 
 long phash::getpHash(unsigned int key) {
@@ -64,7 +61,6 @@ void phash::generate(unsigned int key) {
 
 }
 
-/*
 using namespace ys;
 
 int main() {
@@ -74,11 +70,9 @@ int main() {
         hashtable.addphKey(i, 50);
     }
     hashtable.addOver();
-
     for (unsigned long i = 0; i < length; i+=4) {
         long offset = hashtable.getpHash(i);
         assert (offset == (i/4)*50);
     }
     return 0;
 }
-*/
