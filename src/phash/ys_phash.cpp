@@ -64,6 +64,7 @@ void phash::generate(unsigned int key) {
 
 }
 
+/*
 using namespace ys;
 
 int main() {
@@ -76,8 +77,8 @@ int main() {
 
     for (unsigned long i = 0; i < length; i+=4) {
         long offset = hashtable.getpHash(i);
-        printf ("%d %ld\n", i, offset);
         assert (offset == (i/4)*50);
     }
     return 0;
 }
+*/
