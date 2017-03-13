@@ -28,8 +28,8 @@ private:
     dataPool& operator=(const dataPool&);
     void judgeSize();
     void resize();
-    void sort(int left, int right);
-    int partition(int left, int right);
+    void sort(long left, long right);
+    long partition(long left, long right);
 };
 
 template <typename T>
@@ -131,7 +131,7 @@ inline void dataPool<T>::sort() {
 }
 
 template <typename T>
-inline void dataPool<T>::sort(int left, int right) {
+inline void dataPool<T>::sort(long left, long right) {
     if (left >= right) {
         return;
     }
@@ -141,7 +141,7 @@ inline void dataPool<T>::sort(int left, int right) {
 }
 
 template <typename T>
-inline int dataPool<T>::partition(int left, int right) {
+inline long dataPool<T>::partition(long left, long right) {
     int i, j = left;
     for (i = left; i < right; ++i) {
         if ((*this)[i] < (*this)[right]){
