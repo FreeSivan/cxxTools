@@ -26,7 +26,11 @@ int main() {
     for (int i = 0; i < intpool.getCurLen(); ++i) {
         printf ("%u\n", intpool[i]);
     }
-
+    printf ("===========================\n");
+    intpool.reset();
+    for (int i = 0; i < intpool.getCurLen(); ++i) {
+        printf ("%u\n", intpool[i]);
+    }
 
     //for (int i = 0; i < 10000000; ++i) {
     //    intpool.push_back(i);
