@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <../datapool/ys_datapool.h>
 
 namespace ys {     // namespace for yue sivan
 
