@@ -116,7 +116,7 @@ inline void DMatrix<T>::setSize(uint x, uint y) {
     }
     dimX_ = x;
     dimY_ = y;
-    if (!value_) {
+    if (value_) {
         delete[] value_[0];
         delete[] value_;
     }
