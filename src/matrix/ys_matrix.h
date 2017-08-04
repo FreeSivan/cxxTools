@@ -108,10 +108,10 @@ inline void DMatrix<T>::setSize(uint x, uint y) {
     dimY_ = y;
     if (!value_) {
         delete[] value_[0];
-        delete[] value;
+        delete[] value_;
     }
-    value_ = new T*[dim1];
-    value_[0] = new T[dim1 * dim2];
+    value_ = new T*[dimX_];
+    value_[0] = new T[dimX_ * dimY_];
     for (uint i = 0; i < dimX_; ++i) {
         value_[i] = value_[0] + i * dimY_;
     }
