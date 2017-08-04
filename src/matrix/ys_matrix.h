@@ -14,18 +14,17 @@ public:
     void init(T v);
     int getDimX() const;
     int getDimY() const;
-    const dataPool<char*>& getColNames()const;
     T get(uint x, uint y) const;
-    void set(uint x, uint y, T v);
-    void setSize(uint x, uint y);
-    void assign(const DMatrix<T>& v);
+    bool set(uint x, uint y, T v);
+    bool setSize(uint x, uint y);
+    bool assign(const DMatrix<T>& v);
 public:
     bool save(char* filename);
     bool load(char* filename);
 public:
     DMatrix<T>& operator=(const DMatrix<T>& v);
     T& operator() (uint x, uint y);
-    T  operator() (uint x, uint y);
+    T  operator() (uint x, uint y) const;
     T* operator() (uint x);
     T* operator[] (uint x); 
 private:
@@ -51,7 +50,7 @@ inline DMatrix<T>::DMatrix(uint x, uint y) {
 
 template <typename T>
 inline DMatrix<T>::DMatrix(const DMatrix<T>& v) {
-    if (dimX_ != v.getDimX() || dimY_ != matrixDimY()) {
+    if (dimX_ != v.getDimX() || dimY_ != v.DimY()) {
         setSize(v.getDimX(), v.getDimY());
     }
     for (int i = 0; i < dimX_; ++i) {
@@ -81,17 +80,23 @@ inline void DMatrix<T>::init(T v) {
 template <typename T>
 inline T DMatrix<T>::get(uint x, uint y) const {
     if (x > dimX_ || y > dimY_) {
-        throw x;
+        goto Error;
     }
     return value_[x][y];
+Error:
+    throw x;
 }
 
 template <typename T>
-inline void DMatrix<T>::set(uint x, uint y, T value) {
+inline bool DMatrix<T>::set(uint x, uint y, T value) {
     if (x > dimX_ || y > dimY_) {
-        throw x;
+        goto Error;
     }
     value_[x][y] = T;
+Finish:
+    return 1;
+Error:
+    return 0;
 }
 
 template <typename T>
@@ -136,18 +141,18 @@ inline T& DMatrix<T>::operator() (uint x, uint y) {
 }
 
 template <typename T>
-inline T  DMatrix<T>::operator() (uint x, uint y) {
+inline T  DMatrix<T>::operator() (uint x, uint y) const{
     return value_[x][y]
 }
 
 template <typename T>
 inline T* DMatrix<T>::operator() (uint x) {
-    return value[x];
+    return value_[x];
 }
 
 template <typename T>
 inline T* DMatrix<T>::operator[] (uint x) {
-    return value[x];
+    return value_[x];
 }
 
 template <typename T>
