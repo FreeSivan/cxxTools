@@ -18,7 +18,7 @@ int main(void) {
     }
     }
     dmatrix.save("tmpfile");
-    DMatrix<double> dmatrix1();
+    DMatrix<double> dmatrix1;
     dmatrix1.load("tmpfile");
     for (int i = 0; i < dmatrix1.getDimX(); ++i) {
     for (int j = 0; j < dmatrix1.getDimY(); ++j) {
@@ -26,7 +26,7 @@ int main(void) {
     }
     }
 
-    DMatrix<double> dmatrix2();
+    DMatrix<double> dmatrix2;
     dmatrix2 = dmatrix;
     for (int i = 0; i < dmatrix2.getDimX(); ++i) {
     for (int j = 0; j < dmatrix2.getDimY(); ++j) {
@@ -34,7 +34,7 @@ int main(void) {
     }
     }
 
-    DMatrix<double> dmatrix3();
+    DMatrix<double> dmatrix3;
     dmatrix3.assign(dmatrix1);
     for (int i = 0; i < dmatrix3.getDimX(); ++i) {
     for (int j = 0; j < dmatrix3.getDimY(); ++j) {
