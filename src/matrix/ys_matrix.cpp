@@ -17,38 +17,44 @@ int main(void) {
         dmatrix(i, j) = ran_uniform();
     }
     }
+    assert (dmatrix.getDimX() == 100);
+    assert (dmatrix.getDimY() == 1000);
     dmatrix.save("tmpfile");
     DMatrix<double> dmatrix1;
     dmatrix1.load("tmpfile");
+    assert (dmatrix1.getDimX() == 100);
+    assert (dmatrix1.getDimY() == 1000);
     for (int i = 0; i < dmatrix1.getDimX(); ++i) {
     for (int j = 0; j < dmatrix1.getDimY(); ++j) {
-        printf ("1\n");
         assert (dmatrix1[i][j] = dmatrix[i][j]);
     }
     }
 
     DMatrix<double> dmatrix2;
     dmatrix2 = dmatrix;
+    assert (dmatrix2.getDimX() == 100);
+    assert (dmatrix2.getDimY() == 1000);
     for (int i = 0; i < dmatrix2.getDimX(); ++i) {
     for (int j = 0; j < dmatrix2.getDimY(); ++j) {
-        printf ("2\n");
         assert (dmatrix1[i][j] = dmatrix2[i][j]);
     }
     }
 
     DMatrix<double> dmatrix3;
     dmatrix3.assign(dmatrix1);
+    assert (dmatrix3.getDimX() == 100);
+    assert (dmatrix3.getDimY() == 1000);
     for (int i = 0; i < dmatrix3.getDimX(); ++i) {
     for (int j = 0; j < dmatrix3.getDimY(); ++j) {
-        printf ("3\n");
         assert (dmatrix3[i][j] = dmatrix2[i][j]);
     }
     }
 
     DMatrix<double> dmatrix4(dmatrix2);
+    assert (dmatrix4.getDimX() == 100);
+    assert (dmatrix4.getDimY() == 1000);
     for (int i = 0; i < dmatrix4.getDimX(); ++i) {
     for (int j = 0; j < dmatrix4.getDimY(); ++j) {
-        printf ("4\n");
         assert (dmatrix4[i][j] = dmatrix[i][j]);
     }
     }
