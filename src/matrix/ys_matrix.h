@@ -101,17 +101,17 @@ Error:
 
 template <typename T>
 inline void DMatrix<T>::setSize(uint x, uint y) {
-    if ((dim1 == x) && (dim2 == y)) {
+    if ((dimX_ == x) && (dimY_ == y)) {
         return;
     }
     dimX_ = x;
     dimY_ = y;
-    if (!value) {
+    if (!value_) {
         delete[] value_[0];
         delete[] value;
     }
-    value = new T*[dim1];
-    value[0] = new T[dim1 * dim2];
+    value_ = new T*[dim1];
+    value_[0] = new T[dim1 * dim2];
     for (uint i = 0; i < dimX_; ++i) {
         value_[i] = value_[0] + i * dimY_;
     }
