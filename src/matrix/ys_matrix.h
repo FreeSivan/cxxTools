@@ -147,6 +147,7 @@ inline DMatrix<T>& DMatrix<T>::operator=(const DMatrix<T>& v) {
 
 template <typename T>
 inline T& DMatrix<T>::operator() (uint x, uint y) {
+    printf ("1\n");
     return value_[x][y];
 }
 
@@ -171,12 +172,14 @@ inline bool DMatrix<T>::save(char* filename) {
     if (!fp) {
         goto Error;
     }
+    printf ("code here\n");
     fwrite(&dimX_, sizeof(uint), 1, fp);
     fwrite(&dimY_, sizeof(uint), 1, fp);
     for (int i = 0; i < dimX_; ++i) {
         fwrite(value_[i], sizeof(T), dimY_, fp);
     }
     fclose(fp);
+    printf ("code here1\n");
 
 Finish:
     return 1;
