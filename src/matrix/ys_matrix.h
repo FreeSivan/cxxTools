@@ -16,8 +16,8 @@ public:
     int getDimY() const;
     T get(uint x, uint y) const;
     bool set(uint x, uint y, T v);
-    bool setSize(uint x, uint y);
-    bool assign(const DMatrix<T>& v);
+    void setSize(uint x, uint y);
+    void assign(const DMatrix<T>& v);
 public:
     bool save(char* filename);
     bool load(char* filename);
@@ -88,11 +88,11 @@ Error:
 }
 
 template <typename T>
-inline bool DMatrix<T>::set(uint x, uint y, T value) {
+inline bool DMatrix<T>::set(uint x, uint y, T v) {
     if (x > dimX_ || y > dimY_) {
         goto Error;
     }
-    value_[x][y] = T;
+    value_[x][y] = v;
 Finish:
     return 1;
 Error:
@@ -137,12 +137,12 @@ inline DMatrix<T>& DMatrix<T>::operator=(const DMatrix<T>& v) {
 
 template <typename T>
 inline T& DMatrix<T>::operator() (uint x, uint y) {
-    return value_[x][y]
+    return value_[x][y];
 }
 
 template <typename T>
 inline T  DMatrix<T>::operator() (uint x, uint y) const{
-    return value_[x][y]
+    return value_[x][y];
 }
 
 template <typename T>
@@ -178,7 +178,7 @@ template <typename T>
 inline bool DMatrix<T>::load(char* filename) {
     FILE *fp = fopen(filename, "rb");
     if (!fp) {
-        goto Error:
+        goto Error;
     }
     int dimx, dimy;
     fread(&dimx, sizeof(uint), 1, fp);
