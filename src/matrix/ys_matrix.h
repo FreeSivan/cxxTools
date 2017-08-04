@@ -78,6 +78,16 @@ inline void DMatrix<T>::init(T v) {
 }
 
 template <typename T>
+inline int DMatrix<T>::getDimX() const {
+    return dimX_;
+}
+
+template <typename T>
+inline int DMatrix<T>::getDimY() const {
+    return dimY_;
+}
+
+template <typename T>
 inline T DMatrix<T>::get(uint x, uint y) const {
     if (x > dimX_ || y > dimY_) {
         goto Error;
