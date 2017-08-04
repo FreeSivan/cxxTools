@@ -50,7 +50,7 @@ inline DMatrix<T>::DMatrix(uint x, uint y) {
 
 template <typename T>
 inline DMatrix<T>::DMatrix(const DMatrix<T>& v) {
-    if (dimX_ != v.getDimX() || dimY_ != v.DimY()) {
+    if (dimX_ != v.getDimX() || dimY_ != v.getDimY()) {
         setSize(v.getDimX(), v.getDimY());
     }
     for (int i = 0; i < dimX_; ++i) {
