@@ -50,14 +50,7 @@ inline DMatrix<T>::DMatrix(uint x, uint y) {
 
 template <typename T>
 inline DMatrix<T>::DMatrix(const DMatrix<T>& v) {
-    if (dimX_ != v.getDimX() || dimY_ != v.getDimY()) {
-        setSize(v.getDimX(), v.getDimY());
-    }
-    for (int i = 0; i < dimX_; ++i) {
-    for (int j = 0; j < dimY_; ++j) {
-        value_[i][j] = v[i][j];
-    }
-    }
+    assign(v);
 }
 
 template <typename T>
@@ -134,7 +127,7 @@ inline void DMatrix<T>::assign(const DMatrix<T>& v) {
     }
     for (int i = 0; i < dimX_; ++i) {
     for (int j = 0; j < dimY_; ++j) {
-        value_[i][j] = v[i][j];
+        value_[i][j] = v(i, j);
     }
     }
 }
