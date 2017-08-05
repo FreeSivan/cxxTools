@@ -22,7 +22,7 @@ int main(void) {
     }
     printf ("----------------------------\n");
 
-    DMatrix<int> matrix2(3, 4);
+    DMatrix<int> matrix2(3, 2);
     matrix2[0][0] = 8;
     matrix2[0][1] = 9;
     matrix2[1][0] = 1;
