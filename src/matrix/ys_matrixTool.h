@@ -1,6 +1,6 @@
 #ifndef _YS_MATRIX_TOOL_H_
 #define _YS_MATRIX_TOOL_H_
-
+#include <stdio.h>
 #include "ys_matrix.h"
 
 namespace ys {      // namespace for yue sivan
@@ -67,10 +67,11 @@ inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
     for (int i = 0; i < dimX; ++i) {
     for (int j = 0; j < dimY; ++j) {
-        int sum = 0;
+        T sum = 0;
         for (int k = 0; k < dimK; ++k) {
             sum += A[i][k] * B[k][j];
         }
+        printf ("i = %d, j = %d, result = %d\n", i, j, sum);
         (*result)[i][j] = sum;
     }
     }
@@ -125,7 +126,7 @@ inline T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, in
         throw r;
     }
     int dimK = A.getDimY();
-    int result = 0;
+    T result = 0;
     for (int i = 0; i < dimK; ++i) {
         result += A[r][i] * B[i][c];
     }
