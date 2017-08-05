@@ -5,8 +5,10 @@
 using namespace ys;
 
 int main(void) {
-    DMatrix<int> matrix1;
+    DMatrix<int> matrix1(2, 3);
+    printf ("1\n");
     matrix1[0][0] = 7;
+    printf ("1\n");
     matrix1[0][1] = 6;
     matrix1[0][2] = 2;
     matrix1[1][0] = 3;
@@ -21,7 +23,7 @@ int main(void) {
     }
     printf ("----------------------------\n");
 
-    DMatrix<int> matrix2;
+    DMatrix<int> matrix2(3, 4);
     matrix1[0][0] = 8;
     matrix1[0][1] = 9;
     matrix1[1][0] = 1;
