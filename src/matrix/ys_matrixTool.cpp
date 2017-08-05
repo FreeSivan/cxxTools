@@ -21,13 +21,15 @@ int main(void) {
     matrix1[2][0] = 3;
     matrix1[2][1] = 8;
 
-    DMatrix<int>* matrix3 = Matrixs::mul(matrix1, matrix2);
+    DMatrix<int>* matrix3 = Matrixs<int>::mul(matrix1, matrix2);
 
-    for (int i = 0; i < matrix3.getDimX(); ++i) {
-    for (int j = 0; j < matrix3.getDimY(); ++j) {
+    for (int i = 0; i < matrix3->getDimX(); ++i) {
+    for (int j = 0; j < matrix3->getDimY(); ++j) {
         printf ("%d ", matrix3[i][j]);
     }
     printf ("\n");
     }
+
+    delete matrix3;
     return 0;
 }
