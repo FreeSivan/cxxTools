@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#ifndef _YS_DMATRIX_H_
+#define _YS_DMATRIX_H_
+
 namespace ys {     // namespace for yue sivan
 
 typedef unsigned int uint;
@@ -201,3 +204,5 @@ Error:
 }
 
 };
+
+#endif //_YS_DMATRIX_H_
