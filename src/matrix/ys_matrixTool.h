@@ -30,7 +30,7 @@ public:
 template <typename T>
 inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
-        goto Error;
+        return 0;
     }
     int dimX = A.getDimX();
     int dimY = A.getDimY();
@@ -40,10 +40,7 @@ inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
         (*result)[i][j] = A[i][j] + B[i][j];
     }
     }
-Finish:
     return result;
-Error:
-    return 0;
 }
 
 /*
@@ -62,7 +59,7 @@ Error:
 template <typename T>
 inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
-        goto Error;
+        return 0;
     }
     int dimX = A.getDimX();
     int dimY = B.getDimY();
@@ -77,10 +74,7 @@ inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
         result[i][j] = sum;
     }
     }
-Finish:
     return result;
-Error:
-    return 0;
 }
 
 /*
@@ -99,7 +93,7 @@ Error:
 template <typename T>
 inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
-        goto Error;
+        return 0;
     }
     int dimX = A.getDimX();
     int dimY = A.getDimY();
@@ -109,10 +103,7 @@ inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
         (*result)[i][j] = A[i][j] - B[i][j];
     }
     }
-Finish:
     return result;
-Error:
-    return 0;
 }
 
 /*
@@ -131,17 +122,14 @@ Error:
 template <typename T>
 inline T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     if (A.getDimY() != B.getDimX()) {
-        goto Error;
+        throw r;
     }
     int dimK = A.getDimY();
     int result = 0;
     for (int i = 0; i < dimK; ++i) {
         result += A[r][i] * B[i][c];
     }
-Finish:
     return result;
-Error:
-    throw r;
 }
 
 };
