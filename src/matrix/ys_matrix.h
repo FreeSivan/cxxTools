@@ -87,23 +87,18 @@ inline int DMatrix<T>::getDimY() const {
 template <typename T>
 inline T DMatrix<T>::get(uint x, uint y) const {
     if (x > dimX_ || y > dimY_) {
-        goto Error;
+        throw x;
     }
     return value_[x][y];
-Error:
-    throw x;
 }
 
 template <typename T>
 inline bool DMatrix<T>::set(uint x, uint y, T v) {
     if (x > dimX_ || y > dimY_) {
-        goto Error;
+        return 0;
     }
     value_[x][y] = v;
-Finish:
     return 1;
-Error:
-    return 0;
 }
 
 template <typename T>
@@ -172,7 +167,7 @@ template <typename T>
 inline bool DMatrix<T>::save(char* filename) {
     FILE *fp = fopen(filename, "wb");
     if (!fp) {
-        goto Error;
+        return 0;
     }
     fwrite(&dimX_, sizeof(uint), 1, fp);
     fwrite(&dimY_, sizeof(uint), 1, fp);
@@ -180,18 +175,14 @@ inline bool DMatrix<T>::save(char* filename) {
         fwrite(value_[i], sizeof(T), dimY_, fp);
     }
     fclose(fp);
-
-Finish:
     return 1;
-Error:
-    return 0;
 }
 
 template <typename T>
 inline bool DMatrix<T>::load(char* filename) {
     FILE *fp = fopen(filename, "rb");
     if (!fp) {
-        goto Error;
+        return 0;
     }
     int dimx, dimy;
     fread(&dimx, sizeof(uint), 1, fp);
@@ -203,11 +194,7 @@ inline bool DMatrix<T>::load(char* filename) {
         fread(value_[i], sizeof(T), dimY_, fp);
     }
     fclose(fp);
-    
-Finish:
     return 1;
-Error:
-    return 0;
 }
 
 };
