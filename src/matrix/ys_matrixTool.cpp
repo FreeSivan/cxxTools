@@ -42,7 +42,7 @@ int main(void) {
 
     for (int i = 0; i < matrix3->getDimX(); ++i) {
     for (int j = 0; j < matrix3->getDimY(); ++j) {
-        printf ("%d ", matrix3[i][j]);
+        printf ("%d ", (*matrix3)[i][j]);
     }
     printf ("\n");
     }
