@@ -13,8 +13,8 @@ int main(void) {
     matrix1[1][1] = 2;
     matrix1[1][2] = 5;
 
-    for (int i = 0; i < matrix1->getDimX(); ++i) {
-    for (int j = 0; j < matrix1->getDimY(); ++j) {
+    for (int i = 0; i < matrix1.getDimX(); ++i) {
+    for (int j = 0; j < matrix1.getDimY(); ++j) {
         printf ("%d ", matrix1[i][j]);
     }
     printf ("\n");
@@ -29,8 +29,8 @@ int main(void) {
     matrix1[2][0] = 3;
     matrix1[2][1] = 8;
 
-    for (int i = 0; i < matrix2->getDimX(); ++i) {
-    for (int j = 0; j < matrix2->getDimY(); ++j) {
+    for (int i = 0; i < matrix2.getDimX(); ++i) {
+    for (int j = 0; j < matrix2.getDimY(); ++j) {
         printf ("%d ", matrix2[i][j]);
     }
     printf ("\n");
