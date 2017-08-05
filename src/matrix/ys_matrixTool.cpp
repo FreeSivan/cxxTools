@@ -26,11 +26,15 @@ int main(void) {
     matrix1[0][0] = 8;
         printf ("1\n");
     matrix1[0][1] = 9;
-    matrix1[1][0] = 1;
-    matrix1[1][1] = 6;
-    matrix1[2][0] = 3;
-    matrix1[2][1] = 8;
     printf ("2\n");
+    matrix1[1][0] = 1;
+    printf ("3\n");
+    matrix1[1][1] = 6;
+    printf ("4\n");
+    matrix1[2][0] = 3;
+    printf ("5\n");
+    matrix1[2][1] = 8;
+    printf ("6\n");
 
     for (int i = 0; i < matrix2.getDimX(); ++i) {
     for (int j = 0; j < matrix2.getDimY(); ++j) {
