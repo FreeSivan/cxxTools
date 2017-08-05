@@ -7,10 +7,10 @@ namespace ys {      // namespace for yue sivan
 
 template <typename T> class Matrixs {
 public:
-    Matrix<T>* add(const Matrix<T>& A, const Matrix<T>& B);
-    Matrix<T>* mul(const Matrix<T>& A, const Matrix<T>& B);
-    Matrix<T>* sub(const Matrix<T>& A, const Matrix<T>& B);
-    T mulLine(const Matrix<T>& A, const Matrix<T>& B, int r, int c);
+    DMatrix<T>* add(const DMatrix<T>& A, const DMatrix<T>& B);
+    DMatrix<T>* mul(const DMatrix<T>& A, const DMatrix<T>& B);
+    DMatrix<T>* sub(const DMatrix<T>& A, const DMatrix<T>& B);
+    T mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c);
 };
 
 /*
@@ -28,13 +28,13 @@ public:
  *
  */
 template <typename T>
-inline Matrix<T>* Matrixs<T>::add(const Matrix<T>& A, const Matrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         goto Error;
     }
     int dimX = A.getDimX();
     int dimY = A.getDimY();
-    Matrix<T>* result = new Matrix<T>(dimX, dimY);
+    DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
     for (int i = 0; i < dimX; ++i) {
     for (int j = 0; j < dimY; ++j) {
         (*result)[i][j] = A[i][j] + B[i][j];
@@ -60,14 +60,14 @@ Error:
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline Matrix<T>* Matrixs<T>::mul(const Matrix<T>& A, const Matrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
         goto Error;
     }
     int dimX = A.getDimX();
     int dimY = B.getDimY();
     int dimK = A.getDimY();
-    Matrix<T>* result = new Matrix<T>(dimX, dimY);
+    DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
     for (int i = 0; i < dimX; ++i) {
     for (int j = 0; j < dimY; ++j) {
         int sum = 0;
@@ -97,13 +97,13 @@ Error:
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline Matrix<T>* Matrixs<T>::sub(const Matrix<T>& A, const Matrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         goto Error;
     }
     int dimX = A.getDimX();
     int dimY = A.getDimY();
-    Matrix<T>* result = new Matrix<T>(dimX, dimY);
+    DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
     for (int i = 0; i < dimX; ++i) {
     for (int j = 0; j < dimY; ++j) {
         (*result)[i][j] = A[i][j] - B[i][j];
@@ -129,7 +129,7 @@ Error:
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline T Matrixs<T>::mulLine(const Matrix<T>& A, const Matrix<T>& B, int r, int c) {
+inline T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     if (A.getDimY() != B.getDimX()) {
         goto Error;
     }
