@@ -28,7 +28,7 @@ public:
  *
  */
 template <typename T>
-static DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         return 0;
     }
@@ -57,7 +57,7 @@ static DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-static DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
         return 0;
     }
@@ -91,7 +91,7 @@ static DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-static DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
+inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         return 0;
     }
@@ -120,7 +120,7 @@ static DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-static T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
+inline T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     if (A.getDimY() != B.getDimX()) {
         throw r;
     }
