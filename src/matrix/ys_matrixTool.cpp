@@ -6,9 +6,8 @@ using namespace ys;
 
 int main(void) {
     DMatrix<int> matrix1(2, 3);
-    printf ("1\n");
+
     matrix1[0][0] = 7;
-    printf ("1\n");
     matrix1[0][1] = 6;
     matrix1[0][2] = 2;
     matrix1[1][0] = 3;
@@ -25,11 +24,13 @@ int main(void) {
 
     DMatrix<int> matrix2(3, 4);
     matrix1[0][0] = 8;
+        printf ("1\n");
     matrix1[0][1] = 9;
     matrix1[1][0] = 1;
     matrix1[1][1] = 6;
     matrix1[2][0] = 3;
     matrix1[2][1] = 8;
+    printf ("2\n");
 
     for (int i = 0; i < matrix2.getDimX(); ++i) {
     for (int j = 0; j < matrix2.getDimY(); ++j) {
