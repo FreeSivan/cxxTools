@@ -7,10 +7,10 @@ namespace ys {      // namespace for yue sivan
 
 template <typename T> class Matrixs {
 public:
-    DMatrix<T>* add(const DMatrix<T>& A, const DMatrix<T>& B);
-    DMatrix<T>* mul(const DMatrix<T>& A, const DMatrix<T>& B);
-    DMatrix<T>* sub(const DMatrix<T>& A, const DMatrix<T>& B);
-    T mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c);
+    static DMatrix<T>* add(const DMatrix<T>& A, const DMatrix<T>& B);
+    static DMatrix<T>* mul(const DMatrix<T>& A, const DMatrix<T>& B);
+    static DMatrix<T>* sub(const DMatrix<T>& A, const DMatrix<T>& B);
+    static T mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c);
 };
 
 /*
@@ -28,7 +28,7 @@ public:
  *
  */
 template <typename T>
-inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
+static DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         return 0;
     }
@@ -57,7 +57,7 @@ inline DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
+static DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
         return 0;
     }
@@ -91,7 +91,7 @@ inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
+static DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
         return 0;
     }
@@ -120,7 +120,7 @@ inline DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
  *      this function, it must be release by caller!!!!!
  */
 template <typename T>
-inline T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
+static T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     if (A.getDimY() != B.getDimX()) {
         throw r;
     }
