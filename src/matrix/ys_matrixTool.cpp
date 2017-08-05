@@ -13,6 +13,14 @@ int main(void) {
     matrix1[1][1] = 2;
     matrix1[1][2] = 5;
 
+    for (int i = 0; i < matrix1->getDimX(); ++i) {
+    for (int j = 0; j < matrix1->getDimY(); ++j) {
+        printf ("%d ", matrix1[i][j]);
+    }
+    printf ("\n");
+    }
+    printf ("----------------------------\n");
+
     DMatrix<int> matrix2;
     matrix1[0][0] = 8;
     matrix1[0][1] = 9;
@@ -20,6 +28,14 @@ int main(void) {
     matrix1[1][1] = 6;
     matrix1[2][0] = 3;
     matrix1[2][1] = 8;
+
+    for (int i = 0; i < matrix2->getDimX(); ++i) {
+    for (int j = 0; j < matrix2->getDimY(); ++j) {
+        printf ("%d ", matrix2[i][j]);
+    }
+    printf ("\n");
+    }
+    printf ("----------------------------\n");
 
     DMatrix<int>* matrix3 = Matrixs<int>::mul(matrix1, matrix2);
 
