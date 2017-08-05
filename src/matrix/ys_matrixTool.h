@@ -71,7 +71,7 @@ inline DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
         for (int k = 0; k < dimK; ++k) {
             sum += A[i][k] * B[k][j];
         }
-        result[i][j] = sum;
+        (*result)[i][j] = sum;
     }
     }
     return result;

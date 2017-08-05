@@ -29,6 +29,7 @@ public:
     T& operator() (uint x, uint y);
     T  operator() (uint x, uint y) const;
     T* operator() (uint x);
+    const T* operator[] (uint x) const;
     T* operator[] (uint x); 
 private:
     T** value_;
@@ -153,6 +154,12 @@ inline T  DMatrix<T>::operator() (uint x, uint y) const{
 
 template <typename T>
 inline T* DMatrix<T>::operator() (uint x) {
+    return value_[x];
+}
+
+
+template <typename T>
+inline const T* DMatrix<T>::operator[] (uint x) const{
     return value_[x];
 }
 
