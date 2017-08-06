@@ -1,28 +1,86 @@
+#include <string.h>
 #include "ys_msTrainer.h"
+#include "../matrix/ys_matrixTool.h"
 
 namespace ys {
 
-MsTrainer::MsTrainer() {}
-
-MsTrainer::~MsTrainer() {}
+MsTrainer::MsTrainer() {
+    minError_ = 0.01;
+    learnStep_ = 0.1;
+    maxTrainNum_= 65536;
+    factorNum_ = 100;
+    trainFlag_ = MS_SDT; 
+}
 
 bool MsTrainer::load(char *path) {
-    return r_.load(path)
+    return r_.load(path);
 }
 
 bool MsTrainer::save(char *path) {
     bool ret1 = p_.save(path);
     bool ret2 = q_.save(path);
-    return (ret && ret);
+    return (ret1 && ret2);
 }
 
-bool MsTrainer::train() {
-    
+void MsTrainer::setMinError(double minError) {
+    minError_ = minError;
 }
 
-bool MsTrainer::trainDT() {
+void MsTrainer::setLearnStep(double minLearnStep) {
+    learnStep_ = minLearnStep;
+}
+
+void MsTrainer::setMaxTrainNum(int maxTrainNum) {
+    maxTrainNum_ = maxTrainNum;
+}
+
+void MsTrainer::setFactorNum(int factorNum) {
+    factorNum_ = factorNum;
+}
+
+void MsTrainer::setTrainFlag(int trainFlag) {
+    trainFlag_ = trainFlag;
+}
+
+void MsTrainer::setPFileName(char *pfileName) {
+    int len = strlen(pfileName);
+    if (len >= 256) {
+        return;
+    }
+    memcpy(pfileName_, pfileName, len);
+    pfileName_[len] = 0;
+}
+
+void MsTrainer::setQFileName(char *qfileName) {
+    int len = strlen(qfileName);
+    if (len >= 256) {
+        return;
+    }
+    memcpy(qfileName_, qfileName, len);
+    qfileName_[len] = 0;
+}
+
+void MsTrainer::train() {
+    switch (trainFlag_) {
+        case MS_DT: {
+            trainDT();
+            break;
+        }
+        case MS_SDT: {
+            trainSDT();
+            break;
+        }
+        default :{
+            break; 
+        }
+    }
+}
+
+void MsTrainer::trainDT() {
     DMatrix<double> r(r_.getDimX(), r_.getDimY());
     int trainNum = 0;
+    int dimX = r_.getDimX();
+    int dimY = r_.getDimY();
     while (trainNum < maxTrainNum_) {
         for (int i = 0; i < dimX; ++i) {
         for (int j = 0; j < dimY; ++j) {
@@ -43,7 +101,7 @@ bool MsTrainer::trainDT() {
     }
 }
 
-bool MsTrainer::trainDTImpl(DMatrix<double>& r) {
+void MsTrainer::trainDTImpl(DMatrix<double>& r) {
     int dimX = r_.getDimX();
     int dimY = r_.getDimY();
     int dimK = factorNum_;
@@ -56,8 +114,8 @@ bool MsTrainer::trainDTImpl(DMatrix<double>& r) {
                 }
                 thita = (r_[i][j]-r[i][j])*(-q_[k][j]);
             }
+            p_[i][k] -= learnStep_ * thita;
         }
-        p_[i][k] -= learnStep_ * thita;
     }
     thita = 0;
     for (int j = 0; j < dimY; ++j) {
@@ -66,14 +124,14 @@ bool MsTrainer::trainDTImpl(DMatrix<double>& r) {
                 if (!r_[i][j]) {
                     continue;
                 }
-                thita = (r_[i][j]-r[i][j])*(-p[i][k]);
+                thita = (r_[i][j]-r[i][j])*(-p_[i][k]);
             }
+            q_[k][j] -= learnStep_ * thita;
         }
-        q_[k][j] -= learnStep_ * thita;
     }
 }
 
-bool MsTrainer::trainSDT() {
+void MsTrainer::trainSDT() {
     DMatrix<double> r(r_.getDimX(), r_.getDimY());
     int trainNum = 0;
     while (trainNum < maxTrainNum_) {
@@ -88,7 +146,7 @@ bool MsTrainer::trainSDT() {
     }
 }
 
-bool MsTrainer::trainSDTImpl(DMatrix<double>& r) {
+void MsTrainer::trainSDTImpl(DMatrix<double>& r) {
     int dimX = r_.getDimX();
     int dimY = r_.getDimY();
     int dimK = factorNum_;
@@ -97,7 +155,7 @@ bool MsTrainer::trainSDTImpl(DMatrix<double>& r) {
         if (!r_[i][j]) {
             continue;
         }
-        r[i][j] = Matrixs::mulLine(p_, q_, i, j);
+        r[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
         for (int k = 0; k < dimK; ++k) {
             double ptheta = (r_[i][j]-r[i][j])*(-q_[k][j]);
             double qtheta = (r_[i][j]-r[i][j])*(-p_[i][k]);

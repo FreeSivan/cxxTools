@@ -1,6 +1,8 @@
 #ifndef _YS_MATRIX_TOOL_H_
 #define _YS_MATRIX_TOOL_H_
 
+#include <math.h>
+#include <stdio.h>
 #include "ys_matrix.h"
 
 namespace ys {      // namespace for yue sivan
@@ -153,7 +155,7 @@ inline T Matrixs<T>::RMSE(const DMatrix<T>& A, const DMatrix<T>& B) {
     T sum = 0;
     for (int i = 0; i < dimX; ++i) {
     for (int j = 0; j < dimY; ++j) {
-        T += pow((A[i][j]-B[i][j]), 2);
+        sum += pow((A[i][j]-B[i][j]), 2);
     }
     }
     return sqrt(sum / (dimX*dimY));

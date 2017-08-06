@@ -10,7 +10,7 @@ public:
 public:
     virtual bool load(char *path) = 0;
     virtual bool save(char *path) = 0;
-    virtual bool train() = 0;
+    virtual void train() = 0;
 private:
     TrainerBase(const TrainerBase&);
     void operator=(const TrainerBase&);
