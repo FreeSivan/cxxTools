@@ -52,7 +52,9 @@ public:
     ~BPNet();
 private:
     int layNum_;
-    BPLayer *lay;    
+    BPLayer *lay_;    
+    double lRate_;      // learning rate
+    double rRate_;      // regularization rate
 };
 
 }
