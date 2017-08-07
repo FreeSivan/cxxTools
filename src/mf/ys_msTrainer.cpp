@@ -9,7 +9,6 @@ MsTrainer::MsTrainer() {
     learnStep_ = 0.1;
     maxTrainNum_= 65536;
     factorNum_ = 100;
-    trainFlag_ = MS_SDT; 
 }
 
 bool MsTrainer::load(char *path) {
@@ -73,6 +72,56 @@ void MsTrainer::train() {
         default :{
             break; 
         }
+    }
+}
+
+double MsTrianer::dtp(const DMatrix<double>& r, int row, int col) {
+    double thita = 0;
+    for (int j = 0; j < r_.getDimY(); ++j) {
+        if (!r_[row][j]) {
+            continue;    
+        }
+        thita += (r[row][j]-r_[row][j])*(-q_[col][j]);
+    }
+    return thita;
+}
+
+double MsTrainer::dtsp(const DMatrix<double>& r, int row, int col) {
+    double thita = 0;
+}
+
+double MsTrainer::dtq(const DMatrix<double>& r, int row, int col) {
+    double thita = 0;
+    for (int i = 0; i < r_.getDimX(); ++i) {
+        if (!r_[i][row]) {
+            continue;    
+        }
+        thita += (r_[i][row]-r[i][row])*(-p[i][col]);
+    }
+    return thita;
+}
+
+double MsTrainer::dtsq(const DMatrix<double>& r, int row, int col) {
+
+}
+
+void MsTrainer::train() {
+    int trainNum = 0;
+    while (trainNum < trainNum_) {
+        for (int m = 0; m < factorNum_; ++m) {
+            for (int i = 0; i < r_.getDimX(); ++i) {
+                double err = deviateP(i, m);
+                double reg = regularP(i, m);
+                p_[i][m] -= lRate_*(err+rRate_*reg);
+            }
+            for (int j = 0; j < r_.getDimY(); ++j) {
+                double err = deviateQ(m, j);
+                double reg = regularQ(m, j);
+                q_[m][j] = lRate_*(err+rRate_*reg);
+            }
+        }
+        
+        trainNum ++;
     }
 }
 
