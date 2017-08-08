@@ -5,10 +5,17 @@
 namespace ys {
 
 MsTrainer::MsTrainer() {
-    minError_ = 0.01;
-    learnStep_ = 0.1;
-    maxTrainNum_= 65536;
+    trainThr_ = 100000;
     factorNum_ = 100;
+    errThr_ = 0.01;
+    regRate_ = 0.2;
+    learnRate_ = 0.1
+    memcpy(rfilename_, "rfile", sizeof("rfile")); 
+    rfilename_[sizeof("rfile")] = 0;
+    memcpy(pfilename_, "pfile", sizeof("pfile")); 
+    pfileName_[sizeof("pfile")] = 0;
+    memcpy(pfilename_, "qfile", sizeof("qfile")); 
+    qfileName_[sizeof("qfile")] = 0;
 }
 
 bool MsTrainer::load(char *path) {
@@ -21,16 +28,16 @@ bool MsTrainer::save(char *path) {
     return (ret1 && ret2);
 }
 
-void MsTrainer::setMinError(double minError) {
-    minError_ = minError;
+void MsTrainer::setErrThr(double errThr) {
+    errThr_ = errThr;
 }
 
-void MsTrainer::setLearnStep(double minLearnStep) {
-    learnStep_ = minLearnStep;
+void MsTrainer::setLearnRate(double learnRate) {
+    learnRate_ = learnRate;
 }
 
-void MsTrainer::setMaxTrainNum(int maxTrainNum) {
-    maxTrainNum_ = maxTrainNum;
+void MsTrainer::setTrainThr(int trainThr) {
+    trainThr_ = trainThr;
 }
 
 void MsTrainer::setFactorNum(int factorNum) {
@@ -43,7 +50,7 @@ void MsTrainer::setTrainFlag(int trainFlag) {
 
 void MsTrainer::setPFileName(char *pfileName) {
     int len = strlen(pfileName);
-    if (len >= 256) {
+    if (len >= MAX_NAME_LEN) {
         return;
     }
     memcpy(pfileName_, pfileName, len);
@@ -52,168 +59,142 @@ void MsTrainer::setPFileName(char *pfileName) {
 
 void MsTrainer::setQFileName(char *qfileName) {
     int len = strlen(qfileName);
-    if (len >= 256) {
+    if (len >= MAX_NAME_LEN) {
         return;
     }
     memcpy(qfileName_, qfileName, len);
     qfileName_[len] = 0;
 }
 
-void MsTrainer::train() {
-    switch (trainFlag_) {
-        case MS_DT: {
-            trainDT();
+void MsTrainer::setRFileName(char* rFileName) {
+    int len = strlen(rFileName);
+    if (len >= MAX_NAME_LEN) {
+        return;
+    }
+    memcpy(rfileName_, rfileName, len);
+    rfileName_[len] = 0;
+}
+
+void DTMsTrainer::train() {
+    r1_.reset(r_.getDimX(), r_.getDimY());
+    int trainNum = 0;
+    while (trainNum < trainThr_) {
+        if (trainImpl(trainNum)) {
             break;
         }
-        case MS_SDT: {
-            trainSDT();
-            break;
-        }
-        default :{
-            break; 
-        }
+        trainNum ++;
     }
 }
 
-double MsTrianer::dtp(const DMatrix<double>& r, int row, int col) {
+double DTMsTrainer::errorFuncP(int row, int col) {
     double thita = 0;
+    int count = 0;
     for (int j = 0; j < r_.getDimY(); ++j) {
         if (!r_[row][j]) {
-            continue;    
+            continue;
         }
-        thita += (r[row][j]-r_[row][j])*(-q_[col][j]);
+        count ++;
+        thita += (r_[row][j]-r1_[row][j])*(-q_[col][j]);
     }
-    return thita;
+    if (!count) {
+        return 0;
+    }
+    return thita / count;
 }
 
-double MsTrainer::dtsp(const DMatrix<double>& r, int row, int col) {
+double DTMsTrainer::errorFuncQ(int row, int col) {
     double thita = 0;
-}
-
-double MsTrainer::dtq(const DMatrix<double>& r, int row, int col) {
-    double thita = 0;
+    int count = 0;
     for (int i = 0; i < r_.getDimX(); ++i) {
-        if (!r_[i][row]) {
-            continue;    
+        if (!r_[i][col]) {
+            continue;
         }
-        thita += (r_[i][row]-r[i][row])*(-p[i][col]);
+        count ++;
+        thita += (r_[i][col]-r1[i][col])*(-p_[i][row]);
     }
-    return thita;
+    if (!count) {
+        return 0;
+    }
+    return thita / count;
 }
 
-double MsTrainer::dtsq(const DMatrix<double>& r, int row, int col) {
-
+double DTMsTrainer::regularFuncP(int row, int col) {
+    return 0;
 }
 
-void MsTrainer::train() {
-    int trainNum = 0;
-    while (trainNum < trainNum_) {
-        for (int m = 0; m < factorNum_; ++m) {
-            for (int i = 0; i < r_.getDimX(); ++i) {
-                double err = deviateP(i, m);
-                double reg = regularP(i, m);
-                p_[i][m] -= lRate_*(err+rRate_*reg);
-            }
-            for (int j = 0; j < r_.getDimY(); ++j) {
-                double err = deviateQ(m, j);
-                double reg = regularQ(m, j);
-                q_[m][j] = lRate_*(err+rRate_*reg);
-            }
-        }
-        
-        trainNum ++;
-    }
+double DTMsTrainer::regularFuncQ(int row, int col) {
+    return 0;
 }
 
-void MsTrainer::trainDT() {
-    DMatrix<double> r(r_.getDimX(), r_.getDimY());
-    int trainNum = 0;
-    int dimX = r_.getDimX();
-    int dimY = r_.getDimY();
-    while (trainNum < maxTrainNum_) {
-        for (int i = 0; i < dimX; ++i) {
-        for (int j = 0; j < dimY; ++j) {
-            if (!r_[i][j]) {
-                continue;
-            }
-            r[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
-        }
-        }
-        if (!(trainNum % 100)) {
-            double err = Matrixs<double>::RMSE_A(r_, r);
-            if (err < minError_) {
-                break;
-            }
-        }
-        trainDTImpl(r);
-        trainNum ++;
-    }
-}
-
-void MsTrainer::trainDTImpl(DMatrix<double>& r) {
-    int dimX = r_.getDimX();
-    int dimY = r_.getDimY();
-    int dimK = factorNum_;
-    double thita = 0;
-    for (int i = 0; i < dimX; ++i) {
-        for (int k = 0; k < dimK; ++k) {
-            for (int j = 0; j < dimY; ++j) {
-                if (!r_[i][j]) {
-                    continue;
-                }
-                thita = (r_[i][j]-r[i][j])*(-q_[k][j]);
-            }
-            p_[i][k] -= learnStep_ * thita;
-        }
-    }
-    thita = 0;
-    for (int j = 0; j < dimY; ++j) {
-        for (int k = 0; k < dimK; ++k) {
-            for (int i = 0; i < dimX; ++i) {
-                if (!r_[i][j]) {
-                    continue;
-                }
-                thita = (r_[i][j]-r[i][j])*(-p_[i][k]);
-            }
-            q_[k][j] -= learnStep_ * thita;
-        }
-    }
-}
-
-void MsTrainer::trainSDT() {
-    DMatrix<double> r(r_.getDimX(), r_.getDimY());
-    int trainNum = 0;
-    while (trainNum < maxTrainNum_) {
-        trainSDTImpl(r);
-        if (!(trainNum % 100)) {
-            double err = Matrixs<double>::RMSE_A(r_, r);
-            if (err < minError_) {
-                break;
-            }
-        } 
-        trainNum ++;
-    }
-}
-
-void MsTrainer::trainSDTImpl(DMatrix<double>& r) {
-    int dimX = r_.getDimX();
-    int dimY = r_.getDimY();
-    int dimK = factorNum_;
-    for (int i = 0; i < dimX; ++i) {
-    for (int j = 0; j < dimY; ++j) {
+void DTMsTrainer::trainImpl(int index) {
+    for (int i = 0; i < r_.getDimX(); ++i) {
+    for (int j = 0; j < r_.getDimY(); ++j) {
         if (!r_[i][j]) {
             continue;
         }
-        r[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
-        for (int k = 0; k < dimK; ++k) {
-            double ptheta = (r_[i][j]-r[i][j])*(-q_[k][j]);
-            double qtheta = (r_[i][j]-r[i][j])*(-p_[i][k]);
-            p_[i][k] -= learnStep_ * ptheta;
-            q_[k][j] -= learnStep_ * qtheta;
+        r1_[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
+    }
+    }
+    if (!(index % 100)) {
+        dobule err = Matrixs<double>::RMSE_A(*r_, *r1_);
+        if (err < errThr_) {
+            return true;
+        }
+    }
+    for (int m = 0; m < factorNum_; ++m) {
+        for (int i = 0; i < p_.getDimX(); ++i) {
+            double errP = errorFuncP(i, m);
+            double regP = regularFuncP(i, m);
+            p_[i][m] -= learnRate*(errP+regRate*regP);    
+        }
+        for (int j = 0; j < q_.getDimY(); ++j) {
+            double errQ = errorFuncQ(m, j);
+            double regQ = regularFuncQ(m, j);
+            q_[m][j] -= learnRate*(errQ+regRate*regQ);
+        }
+    }
+    return false;
+}
+
+double SDTMsTrainer::errorFuncP(int i, int m, int j) {
+    return (r_[i][j]-r1_[i][j])*(-q_[m][j]);
+}
+
+double SDTMsTrainer::errorFuncQ(int m, int j, int i) {
+    return (r_[i][j]-r1_[i][j])*(-p_[i][m]);
+}
+
+double SDTMsTrainer::regularFuncP(int i, int m) {
+    return 0;
+}
+
+double SDTMsTrainer::regularFuncQ(int m, int j) {
+    return 0;
+}
+
+bool SDTMsTrainer::trainImpl(int index) {
+    for (int i = 0; i < p_.getDimX(); ++i) {
+    for (int j = 0; j < q_.getDimY(); ++j) {
+        if (!r_[i][j]) {
+            continue;
+        }
+        for (int m = 0; m < factorNum_; ++m) {
+            errP = errorFuncP(i, m, j);
+            errQ = errorFuncQ(m, j, i);
+            regP = regularFuncP(i, m);
+            regQ = regularFuncQ(m, j);
+            p_[i][m] -= learnRate*(errP+regRate*regP);
+            q_[m][j] -= learnRate*(errQ+regRate*regQ);
         }
     }
     }
-    
+    if (!(index % 100)) {
+        dobule err = Matrixs<double>::RMSE_A(*r_, *r1_);
+        if (err < errThr_) {
+            return true;
+        }
+    }
+    return false;
 }
 
 };

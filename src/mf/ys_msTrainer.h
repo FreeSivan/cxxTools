@@ -6,6 +6,8 @@
 
 namespace ys {      // namespace for yue sivan
 
+#define MAX_NAME_LEN 256
+
 class MsTrainer : public TrainerBase {
 public:
     MsTrainer();
@@ -13,12 +15,10 @@ public:
 public:
     virtual bool load(char *path);
     virtual bool save(char *path);
+public:
     virtual void train();
 protected:
-    virtual double deviateP(int row, int col) = 0;
-    virtual double deviateQ(int row, int col) = 0;
-    virtual double regularP(int row, int col) = 0;
-    virtual double regularQ(int row, int col) = 0;
+    virtual void trainImpl(int index) = 0;
 public:
     void setErrThr(double ErrThr);
     void setLRate(double lRate);
@@ -28,29 +28,31 @@ public:
     void setQFileName(char* qFileName);
     void setRFileName(char* rFileName);
 private:
-    DMatrix<double> *r_;
-    DMatrix<double> *r1_;
-    DMatrix<double> *p_;
-    DMatrix<double> *q_;
-    double ErrThr_;
-    double lRate_;
-    double rRate_;
     int trainThr_;
     int factorNum_;
-    char rfilename_[256];
-    char pfileName_[256];
-    char qfileName_[256];
+    double errThr_;
+    double regRate_;
+    double learnRate_;
+    DMatrix<double> r_;
+    DMatrix<double> r1_;
+    DMatrix<double> p_;
+    DMatrix<double> q_;
+    char rfilename_[MAX_NAME_LEN];
+    char pfileName_[MAX_NAME_LEN];
+    char qfileName_[MAX_NAME_LEN];
 };
 
 class DTMsTrainer : public MsTrainer {
 public:
     DTMsTrainer() {}
     ~DTMsTrainer() {}
-protected:
-    virtual double deviateP(int row, int col);
-    virtual double deviateQ(int row, int col);
-    virtual double regularP(int row, int col);
-    virtual double regularQ(int row, int col);
+public:
+    virtual bool trainImpl();
+private:
+    double errorFuncP(int row, int col);
+    double errorFuncQ(int row, int col);
+    double regularFuncP(int row, int col);
+    double regularFuncQ(int row, int col);
 };
 
 class SDTMsTrainer : public MsTrainer {
@@ -58,7 +60,12 @@ public:
     SDTMsTrainer() {}
     ~SDTMsTrainer() {}
 public:
-    virtual void train(); 
+    virtual bool trainImpl();
+private: 
+    double errorFuncP(int i, int m, int j);
+    double errorFuncQ(int m, int j, int i);
+    double regularFuncP(int i, int m);
+    double regularFuncQ(int m, int j);
 };
 
 };
