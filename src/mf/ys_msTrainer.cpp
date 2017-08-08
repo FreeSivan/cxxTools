@@ -9,12 +9,12 @@ MsTrainer::MsTrainer() {
     factorNum_ = 100;
     errThr_ = 0.01;
     regRate_ = 0.2;
-    learnRate_ = 0.1
-    memcpy(rfilename_, "rfile", sizeof("rfile")); 
-    rfilename_[sizeof("rfile")] = 0;
-    memcpy(pfilename_, "pfile", sizeof("pfile")); 
+    learnRate_ = 0.1;
+    memcpy(rfileName_, "rfile", sizeof("rfile")); 
+    rfileName_[sizeof("rfile")] = 0;
+    memcpy(pfileName_, "pfile", sizeof("pfile")); 
     pfileName_[sizeof("pfile")] = 0;
-    memcpy(pfilename_, "qfile", sizeof("qfile")); 
+    memcpy(pfileName_, "qfile", sizeof("qfile")); 
     qfileName_[sizeof("qfile")] = 0;
 }
 
@@ -32,7 +32,7 @@ void MsTrainer::setErrThr(double errThr) {
     errThr_ = errThr;
 }
 
-void MsTrainer::setLearnRate(double learnRate) {
+void MsTrainer::setLRate(double learnRate) {
     learnRate_ = learnRate;
 }
 
@@ -42,10 +42,6 @@ void MsTrainer::setTrainThr(int trainThr) {
 
 void MsTrainer::setFactorNum(int factorNum) {
     factorNum_ = factorNum;
-}
-
-void MsTrainer::setTrainFlag(int trainFlag) {
-    trainFlag_ = trainFlag;
 }
 
 void MsTrainer::setPFileName(char *pfileName) {
@@ -66,8 +62,8 @@ void MsTrainer::setQFileName(char *qfileName) {
     qfileName_[len] = 0;
 }
 
-void MsTrainer::setRFileName(char* rFileName) {
-    int len = strlen(rFileName);
+void MsTrainer::setRFileName(char* rfileName) {
+    int len = strlen(rfileName);
     if (len >= MAX_NAME_LEN) {
         return;
     }
@@ -75,8 +71,8 @@ void MsTrainer::setRFileName(char* rFileName) {
     rfileName_[len] = 0;
 }
 
-void DTMsTrainer::train() {
-    r1_.reset(r_.getDimX(), r_.getDimY());
+void MsTrainer::train() {
+    r1_.setSize(r_.getDimX(), r_.getDimY());
     int trainNum = 0;
     while (trainNum < trainThr_) {
         if (trainImpl(trainNum)) {
@@ -110,7 +106,7 @@ double DTMsTrainer::errorFuncQ(int row, int col) {
             continue;
         }
         count ++;
-        thita += (r_[i][col]-r1[i][col])*(-p_[i][row]);
+        thita += (r_[i][col]-r1_[i][col])*(-p_[i][row]);
     }
     if (!count) {
         return 0;
@@ -126,7 +122,7 @@ double DTMsTrainer::regularFuncQ(int row, int col) {
     return 0;
 }
 
-void DTMsTrainer::trainImpl(int index) {
+bool DTMsTrainer::trainImpl(int index) {
     for (int i = 0; i < r_.getDimX(); ++i) {
     for (int j = 0; j < r_.getDimY(); ++j) {
         if (!r_[i][j]) {
@@ -136,7 +132,7 @@ void DTMsTrainer::trainImpl(int index) {
     }
     }
     if (!(index % 100)) {
-        dobule err = Matrixs<double>::RMSE_A(*r_, *r1_);
+        double err = Matrixs<double>::RMSE(r_, r1_);
         if (err < errThr_) {
             return true;
         }
@@ -145,12 +141,12 @@ void DTMsTrainer::trainImpl(int index) {
         for (int i = 0; i < p_.getDimX(); ++i) {
             double errP = errorFuncP(i, m);
             double regP = regularFuncP(i, m);
-            p_[i][m] -= learnRate*(errP+regRate*regP);    
+            p_[i][m] -= learnRate_*(errP+regRate_*regP);    
         }
         for (int j = 0; j < q_.getDimY(); ++j) {
             double errQ = errorFuncQ(m, j);
             double regQ = regularFuncQ(m, j);
-            q_[m][j] -= learnRate*(errQ+regRate*regQ);
+            q_[m][j] -= learnRate_*(errQ+regRate_*regQ);
         }
     }
     return false;
@@ -179,17 +175,17 @@ bool SDTMsTrainer::trainImpl(int index) {
             continue;
         }
         for (int m = 0; m < factorNum_; ++m) {
-            errP = errorFuncP(i, m, j);
-            errQ = errorFuncQ(m, j, i);
-            regP = regularFuncP(i, m);
-            regQ = regularFuncQ(m, j);
-            p_[i][m] -= learnRate*(errP+regRate*regP);
-            q_[m][j] -= learnRate*(errQ+regRate*regQ);
+            double errP = errorFuncP(i, m, j);
+            double errQ = errorFuncQ(m, j, i);
+            double regP = regularFuncP(i, m);
+            double regQ = regularFuncQ(m, j);
+            p_[i][m] -= learnRate_*(errP+regRate_*regP);
+            q_[m][j] -= learnRate_*(errQ+regRate_*regQ);
         }
     }
     }
     if (!(index % 100)) {
-        dobule err = Matrixs<double>::RMSE_A(*r_, *r1_);
+        double err = Matrixs<double>::RMSE(r_, r1_);
         if (err < errThr_) {
             return true;
         }

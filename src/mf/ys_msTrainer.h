@@ -18,7 +18,7 @@ public:
 public:
     virtual void train();
 protected:
-    virtual void trainImpl(int index) = 0;
+    virtual bool trainImpl(int index) = 0;
 public:
     void setErrThr(double ErrThr);
     void setLRate(double lRate);
@@ -27,7 +27,7 @@ public:
     void setPFileName(char* pFileName);
     void setQFileName(char* qFileName);
     void setRFileName(char* rFileName);
-private:
+protected:
     int trainThr_;
     int factorNum_;
     double errThr_;
@@ -37,7 +37,7 @@ private:
     DMatrix<double> r1_;
     DMatrix<double> p_;
     DMatrix<double> q_;
-    char rfilename_[MAX_NAME_LEN];
+    char rfileName_[MAX_NAME_LEN];
     char pfileName_[MAX_NAME_LEN];
     char qfileName_[MAX_NAME_LEN];
 };
@@ -47,7 +47,7 @@ public:
     DTMsTrainer() {}
     ~DTMsTrainer() {}
 public:
-    virtual bool trainImpl();
+    virtual bool trainImpl(int index);
 private:
     double errorFuncP(int row, int col);
     double errorFuncQ(int row, int col);
@@ -60,7 +60,7 @@ public:
     SDTMsTrainer() {}
     ~SDTMsTrainer() {}
 public:
-    virtual bool trainImpl();
+    virtual bool trainImpl(int index);
 private: 
     double errorFuncP(int i, int m, int j);
     double errorFuncQ(int m, int j, int i);
