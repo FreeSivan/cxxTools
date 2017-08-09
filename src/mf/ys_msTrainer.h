@@ -26,6 +26,8 @@ public:
     void setQFileName(char* qFileName);
     void setRFileName(char* rFileName);
 protected:
+    double deviationFunction();
+protected:
     virtual bool trainImpl(int index) = 0;
 protected:
     int trainThr_;          //default 100000
@@ -49,8 +51,8 @@ public:
 public:
     virtual bool trainImpl(int index);
 private:
-    double errorFuncP(int row, int col);
-    double errorFuncQ(int row, int col);
+    double lossFuncP(int row, int col);
+    double lossFuncQ(int row, int col);
     double regularFuncP(int row, int col);
     double regularFuncQ(int row, int col);
 };
@@ -62,8 +64,8 @@ public:
 public:
     virtual bool trainImpl(int index);
 private: 
-    double errorFuncP(int i, int m, int j);
-    double errorFuncQ(int m, int j, int i);
+    double lossFuncP(int i, int m, int j);
+    double lossFuncQ(int m, int j, int i);
     double regularFuncP(int i, int m);
     double regularFuncQ(int m, int j);
 };

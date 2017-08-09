@@ -77,7 +77,7 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
         return 0;
     }
-    DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
+    DMatrix<T>* result = new DMatrix<T>(A.getDimX(), B.getDimY());
     for (int i = 0; i < A.getDimY(); ++i) {
         for (int j = 0; j < B.getDimX(); ++j) {
             (*result)[i][j] = 0;
