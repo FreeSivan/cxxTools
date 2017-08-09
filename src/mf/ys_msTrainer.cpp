@@ -27,23 +27,69 @@ bool MsTrainer::save(char *path) {
     bool ret2 = q_.save(path);
     return (ret1 && ret2);
 }
-
+/*
+ *Summary: Sets the min error threshold for the 
+ *         end of training 
+ *
+ *Parameters:
+ *
+ *   double errThr : min error threshold
+ *
+ *Return : no return 
+ */
 void MsTrainer::setErrThr(double errThr) {
     errThr_ = errThr;
 }
 
+
+/*
+ *Summary: Sets the learning rate of the model 
+ *
+ *Parameters:
+ *
+ *   double learnRate : learing rate of the model
+ *
+ *Return : no return 
+ */
 void MsTrainer::setLRate(double learnRate) {
     learnRate_ = learnRate;
 }
 
+/*
+ *Summary: Set the maximum training times of the model 
+ *
+ *Parameters:
+ *
+ *   int trainThr : the maximum training times
+ *
+ *Return : no return 
+ */
 void MsTrainer::setTrainThr(int trainThr) {
     trainThr_ = trainThr;
 }
 
+/*
+ *Summary: Sets the number of hidden factors 
+ *
+ *Parameters:
+ *
+ *   int factorNum : the number of hidden factors
+ *
+ *Return : no return 
+ */
 void MsTrainer::setFactorNum(int factorNum) {
     factorNum_ = factorNum;
 }
 
+/*
+ *Summary: set the file to save p matrix 
+ *
+ *Parameters:
+ *
+ *   char *pfileName : file name 
+ *
+ *Return : no return 
+ */
 void MsTrainer::setPFileName(char *pfileName) {
     int len = strlen(pfileName);
     if (len >= MAX_NAME_LEN) {
@@ -53,6 +99,15 @@ void MsTrainer::setPFileName(char *pfileName) {
     pfileName_[len] = 0;
 }
 
+/*
+ *Summary: set the file to save q matrix 
+ *
+ *Parameters:
+ *
+ *   char *qfileName : file name 
+ *
+ *Return : no return 
+ */
 void MsTrainer::setQFileName(char *qfileName) {
     int len = strlen(qfileName);
     if (len >= MAX_NAME_LEN) {
@@ -62,6 +117,15 @@ void MsTrainer::setQFileName(char *qfileName) {
     qfileName_[len] = 0;
 }
 
+/*
+ *Summary: set the file to save r matrix 
+ *
+ *Parameters:
+ *
+ *   char *rfileName : file name 
+ *
+ *Return : no return 
+ */
 void MsTrainer::setRFileName(char* rfileName) {
     int len = strlen(rfileName);
     if (len >= MAX_NAME_LEN) {
@@ -71,6 +135,15 @@ void MsTrainer::setRFileName(char* rfileName) {
     rfileName_[len] = 0;
 }
 
+/*
+ *Summary: set the file to save r matrix 
+ *
+ *Parameters:
+ *
+ *   char *rfileName : file name 
+ *
+ *Return : no return 
+ */
 void MsTrainer::train() {
     r1_.setSize(r_.getDimX(), r_.getDimY());
     int trainNum = 0;
@@ -82,15 +155,27 @@ void MsTrainer::train() {
     }
 }
 
-double DTMsTrainer::errorFuncP(int row, int col) {
+/*
+ *Summary: Calculate the gradient value of p[i][m] 
+ *         about the error function 
+ *
+ *Parameters:
+ *
+ *   int i : 
+ *   int m : 
+ *
+ *Return : the gradient value of p[i][m] about the 
+ *         error function 
+ */
+double DTMsTrainer::errorFuncP(int i, int m) {
     double thita = 0;
     int count = 0;
     for (int j = 0; j < r_.getDimY(); ++j) {
-        if (!r_[row][j]) {
+        if (!r_[i][j]) {
             continue;
         }
         count ++;
-        thita += (r_[row][j]-r1_[row][j])*(-q_[col][j]);
+        thita += (r_[i][j]-r1_[i][j])*(-q_[m][j]);
     }
     if (!count) {
         return 0;
@@ -98,15 +183,27 @@ double DTMsTrainer::errorFuncP(int row, int col) {
     return thita / count;
 }
 
-double DTMsTrainer::errorFuncQ(int row, int col) {
+/*
+ *Summary: Calculate the gradient value of q[m][j] 
+ *         about the error function 
+ *
+ *Parameters:
+ *
+ *   int m : 
+ *   int j : 
+ *
+ *Return : the gradient value of q[m][j] about the 
+ *         error function 
+ */
+double DTMsTrainer::errorFuncQ(int m, int j) {
     double thita = 0;
     int count = 0;
     for (int i = 0; i < r_.getDimX(); ++i) {
-        if (!r_[i][col]) {
+        if (!r_[i][j]) {
             continue;
         }
         count ++;
-        thita += (r_[i][col]-r1_[i][col])*(-p_[i][row]);
+        thita += (r_[i][j]-r1_[i][j])*(-p_[i][m]);
     }
     if (!count) {
         return 0;
@@ -114,6 +211,18 @@ double DTMsTrainer::errorFuncQ(int row, int col) {
     return thita / count;
 }
 
+/*
+ *Summary: Calculate the gradient value of q[i][m] 
+ *         about the regular function 
+ *
+ *Parameters:
+ *
+ *   int i : 
+ *   int m : 
+ *
+ *Return : the gradient value of p[i][m] about the 
+ *         error function 
+ */
 double DTMsTrainer::regularFuncP(int row, int col) {
     return 0;
 }

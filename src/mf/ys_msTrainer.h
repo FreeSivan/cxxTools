@@ -17,8 +17,6 @@ public:
     virtual bool save(char *path);
 public:
     virtual void train();
-protected:
-    virtual bool trainImpl(int index) = 0;
 public:
     void setErrThr(double ErrThr);
     void setLRate(double lRate);
@@ -28,15 +26,17 @@ public:
     void setQFileName(char* qFileName);
     void setRFileName(char* rFileName);
 protected:
-    int trainThr_;
-    int factorNum_;
-    double errThr_;
-    double regRate_;
-    double learnRate_;
-    DMatrix<double> r_;
-    DMatrix<double> r1_;
-    DMatrix<double> p_;
-    DMatrix<double> q_;
+    virtual bool trainImpl(int index) = 0;
+protected:
+    int trainThr_;      //default 100000
+    int factorNum_;     //default 100
+    double errThr_;     //default 0.01
+    double regRate_;    //default 0.2
+    double learnRate_;  //default 0.1
+    DMatrix<double> r_; //Training data
+    DMatrix<double> r1_;//Matrix p*q
+    DMatrix<double> p_; //Result matrix p
+    DMatrix<double> q_; //Result matrix q
     char rfileName_[MAX_NAME_LEN];
     char pfileName_[MAX_NAME_LEN];
     char qfileName_[MAX_NAME_LEN];
