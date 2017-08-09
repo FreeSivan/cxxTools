@@ -161,13 +161,13 @@ void MsTrainer::train() {
  *
  *Parameters:
  *
- *   int i : 
- *   int m : 
+ *   int i : dimX of matrix p
+ *   int m : dimY of matrix p
  *
  *Return : the gradient value of p[i][m] about the 
  *         error function 
  */
-double DTMsTrainer::errorFuncP(int i, int m) {
+double GDMsTrainer::errorFuncP(int i, int m) {
     double thita = 0;
     int count = 0;
     for (int j = 0; j < r_.getDimY(); ++j) {
@@ -189,13 +189,13 @@ double DTMsTrainer::errorFuncP(int i, int m) {
  *
  *Parameters:
  *
- *   int m : 
- *   int j : 
+ *   int m : dimX of matrix q
+ *   int j : dimY of matrix q
  *
  *Return : the gradient value of q[m][j] about the 
  *         error function 
  */
-double DTMsTrainer::errorFuncQ(int m, int j) {
+double GDMsTrainer::errorFuncQ(int m, int j) {
     double thita = 0;
     int count = 0;
     for (int i = 0; i < r_.getDimX(); ++i) {
@@ -212,26 +212,48 @@ double DTMsTrainer::errorFuncQ(int m, int j) {
 }
 
 /*
+ *Summary: Calculate the gradient value of p[i][m] 
+ *         about the regular function 
+ *
+ *Parameters:
+ *
+ *   int i : dimX of matrix p
+ *   int m : dimY of matrix p
+ *
+ *Return : the gradient value of p[i][m] about the 
+ *         regular function 
+ */
+double GDMsTrainer::regularFuncP(int i, int m) {
+    return 0;
+}
+
+
+/*
  *Summary: Calculate the gradient value of q[i][m] 
  *         about the regular function 
  *
  *Parameters:
  *
- *   int i : 
- *   int m : 
+ *   int m : dimX of matrix q
+ *   int j : dimY of matrix q
  *
- *Return : the gradient value of p[i][m] about the 
+ *Return : the gradient value of q[i][m] about the 
  *         error function 
  */
-double DTMsTrainer::regularFuncP(int row, int col) {
+double GDMsTrainer::regularFuncQ(int m, int j) {
     return 0;
 }
 
-double DTMsTrainer::regularFuncQ(int row, int col) {
-    return 0;
-}
-
-bool DTMsTrainer::trainImpl(int index) {
+/*
+ *Summary: use standard gradient descent to train model
+ *
+ *Parameters:
+ *
+ *   int index : the current round of training
+ *
+ *Return : true : training over; false : training continue
+ */
+bool GDMsTrainer::trainImpl(int index) {
     for (int i = 0; i < r_.getDimX(); ++i) {
     for (int j = 0; j < r_.getDimY(); ++j) {
         if (!r_[i][j]) {
@@ -261,23 +283,82 @@ bool DTMsTrainer::trainImpl(int index) {
     return false;
 }
 
-double SDTMsTrainer::errorFuncP(int i, int m, int j) {
+/*
+ *Summary: Calculate the gradient value of p[i][m] 
+ *         about the SDT error function 
+ *
+ *Parameters:
+ *
+ *   int i : dimX of matrix p
+ *   int m : dimY of matrix p
+ *   int j : dimY of matrix r
+ *
+ *Return : the gradient value of p[i][m] about the 
+ *         error function 
+ */
+double SGDMsTrainer::errorFuncP(int i, int m, int j) {
     return (r_[i][j]-r1_[i][j])*(-q_[m][j]);
 }
 
-double SDTMsTrainer::errorFuncQ(int m, int j, int i) {
+/*
+ *Summary: Calculate the gradient value of q[m][j] 
+ *         about the SDT error function 
+ *
+ *Parameters:
+ *
+ *   int m : dimX of matrix q
+ *   int j : dimY of matrix q
+ *   int i : dimX of matrix r
+ *
+ *Return : the gradient value of q[m][j] about the 
+ *         error function 
+ */
+double SGDMsTrainer::errorFuncQ(int m, int j, int i) {
     return (r_[i][j]-r1_[i][j])*(-p_[i][m]);
 }
 
-double SDTMsTrainer::regularFuncP(int i, int m) {
+/*
+ *Summary: Calculate the gradient value of p[i][m] 
+ *         about the SDT regular function 
+ *
+ *Parameters:
+ *
+ *   int i : dimX of matrix p
+ *   int m : dimY of matrix p
+ *
+ *Return : the gradient value of p[i][m] about the 
+ *         regular function 
+ */
+double SGDMsTrainer::regularFuncP(int i, int m) {
     return 0;
 }
 
-double SDTMsTrainer::regularFuncQ(int m, int j) {
+/*
+ *Summary: Calculate the gradient value of q[m][j] 
+ *         about the SDT regular function 
+ *
+ *Parameters:
+ *
+ *   int m : dimX of matrix q
+ *   int j : dimY of matrix q
+ *
+ *Return : the gradient value of q[m][j] about the 
+ *         regular function 
+ */
+double SGDMsTrainer::regularFuncQ(int m, int j) {
     return 0;
 }
 
-bool SDTMsTrainer::trainImpl(int index) {
+/*
+ *Summary: use Stochastic gradient descent to train model
+ *
+ *Parameters:
+ *
+ *   int index : the current round of training
+ *
+ *Return : true : training over; false : training continue
+ */
+bool SGDMsTrainer::trainImpl(int index) {
     for (int i = 0; i < p_.getDimX(); ++i) {
     for (int j = 0; j < q_.getDimY(); ++j) {
         if (!r_[i][j]) {

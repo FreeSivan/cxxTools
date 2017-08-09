@@ -28,24 +28,24 @@ public:
 protected:
     virtual bool trainImpl(int index) = 0;
 protected:
-    int trainThr_;      //default 100000
-    int factorNum_;     //default 100
-    double errThr_;     //default 0.01
-    double regRate_;    //default 0.2
-    double learnRate_;  //default 0.1
-    DMatrix<double> r_; //Training data
-    DMatrix<double> r1_;//Matrix p*q
-    DMatrix<double> p_; //Result matrix p
-    DMatrix<double> q_; //Result matrix q
+    int trainThr_;          //default 100000
+    int factorNum_;         //default 100
+    double errThr_;         //default 0.01
+    double regRate_;        //default 0.2
+    double learnRate_;      //default 0.1
+    DMatrix<double> r_;     //Training data
+    DMatrix<double> r1_;    //Matrix p*q
+    DMatrix<double> p_;     //Result matrix p
+    DMatrix<double> q_;     //Result matrix q
     char rfileName_[MAX_NAME_LEN];
     char pfileName_[MAX_NAME_LEN];
     char qfileName_[MAX_NAME_LEN];
 };
 
-class DTMsTrainer : public MsTrainer {
+class GDMsTrainer : public MsTrainer {
 public:
-    DTMsTrainer() {}
-    ~DTMsTrainer() {}
+    GDMsTrainer() {}
+    ~GDMsTrainer() {}
 public:
     virtual bool trainImpl(int index);
 private:
@@ -55,10 +55,10 @@ private:
     double regularFuncQ(int row, int col);
 };
 
-class SDTMsTrainer : public MsTrainer {
+class SGDMsTrainer : public MsTrainer {
 public:
-    SDTMsTrainer() {}
-    ~SDTMsTrainer() {}
+    SGDMsTrainer() {}
+    ~SGDMsTrainer() {}
 public:
     virtual bool trainImpl(int index);
 private: 
