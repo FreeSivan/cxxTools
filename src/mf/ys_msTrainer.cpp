@@ -1,30 +1,49 @@
+#include <stdio.h>
 #include <string.h>
 #include "ys_msTrainer.h"
 #include "../matrix/ys_matrixTool.h"
 
+double ran_uniform();
 namespace ys {
-
 MsTrainer::MsTrainer() {
     trainThr_ = 100000;
-    factorNum_ = 100;
-    errThr_ = 0.01;
+    factorNum_ = 10;
+    errThr_ = 0.001;
     regRate_ = 0.2;
     learnRate_ = 0.1;
     memcpy(rfileName_, "rfile", sizeof("rfile")); 
     rfileName_[sizeof("rfile")] = 0;
     memcpy(pfileName_, "pfile", sizeof("pfile")); 
     pfileName_[sizeof("pfile")] = 0;
-    memcpy(pfileName_, "qfile", sizeof("qfile")); 
+    memcpy(qfileName_, "qfile", sizeof("qfile")); 
     qfileName_[sizeof("qfile")] = 0;
 }
 
 bool MsTrainer::load(char *path) {
-    return r_.load(path);
+    char fullpath[1024] = {0};
+    sprintf (fullpath, "%s/%s", path, rfileName_);
+    r_.load(fullpath);
+    p_.setSize(r_.getDimX(), factorNum_);
+    for (int i = 0; i < r_.getDimX(); ++i) {
+        for (int j = 0; j < factorNum_; ++j) {
+            p_[i][j] = ran_uniform();    
+        }
+    }
+    q_.setSize(factorNum_, r_.getDimY());
+    for (int i = 0; i < factorNum_; ++i) {
+        for (int j = 0; j < r_.getDimY(); ++j) {
+            q_[i][j] = ran_uniform();
+        }
+    }
+    return true;
 }
 
 bool MsTrainer::save(char *path) {
-    bool ret1 = p_.save(path);
-    bool ret2 = q_.save(path);
+    char fullpath[1024] = {0};
+    sprintf (fullpath, "%s/%s", path, pfileName_);
+    bool ret1 = p_.save(fullpath);
+    sprintf (fullpath, "%s/%s", path, qfileName_);
+    bool ret2 = q_.save(fullpath);
     return (ret1 && ret2);
 }
 /*
@@ -155,6 +174,25 @@ void MsTrainer::train() {
     }
 }
 
+double MsTrainer::deviationFunction() {
+    if (r_.getDimX() != r1_.getDimX() || 
+        r_.getDimY() != r1_.getDimY()) {
+        return -1;
+    }
+    double sum = 0;
+    int count = 0;
+    for (int i = 0; i < r_.getDimX(); ++i) {
+    for (int j = 0; j < r_.getDimY(); ++j) {
+        if (!r_[i][j]) {
+            continue;
+        }
+        sum += pow((r_[i][j]-r1_[i][j]), 2);
+        count ++;
+    }
+    }
+    return sqrt(sum / count);
+}
+
 /*
  *Summary: Calculate the gradient value of p[i][m] 
  *         about the error function 
@@ -167,7 +205,7 @@ void MsTrainer::train() {
  *Return : the gradient value of p[i][m] about the 
  *         error function 
  */
-double GDMsTrainer::errorFuncP(int i, int m) {
+double GDMsTrainer::lossFuncP(int i, int m) {
     double thita = 0;
     int count = 0;
     for (int j = 0; j < r_.getDimY(); ++j) {
@@ -195,7 +233,7 @@ double GDMsTrainer::errorFuncP(int i, int m) {
  *Return : the gradient value of q[m][j] about the 
  *         error function 
  */
-double GDMsTrainer::errorFuncQ(int m, int j) {
+double GDMsTrainer::lossFuncQ(int m, int j) {
     double thita = 0;
     int count = 0;
     for (int i = 0; i < r_.getDimX(); ++i) {
@@ -226,7 +264,6 @@ double GDMsTrainer::errorFuncQ(int m, int j) {
 double GDMsTrainer::regularFuncP(int i, int m) {
     return 0;
 }
-
 
 /*
  *Summary: Calculate the gradient value of q[i][m] 
@@ -263,21 +300,20 @@ bool GDMsTrainer::trainImpl(int index) {
     }
     }
     if (!(index % 100)) {
-        double err = Matrixs<double>::RMSE(r_, r1_);
-        if (err < errThr_) {
+        if (deviationFunction() < errThr_) {
             return true;
         }
     }
     for (int m = 0; m < factorNum_; ++m) {
         for (int i = 0; i < p_.getDimX(); ++i) {
-            double errP = errorFuncP(i, m);
+            double lossP = lossFuncP(i, m);
             double regP = regularFuncP(i, m);
-            p_[i][m] -= learnRate_*(errP+regRate_*regP);    
+            p_[i][m] -= learnRate_*(lossP+regRate_*regP);    
         }
         for (int j = 0; j < q_.getDimY(); ++j) {
-            double errQ = errorFuncQ(m, j);
+            double lossQ = lossFuncQ(m, j);
             double regQ = regularFuncQ(m, j);
-            q_[m][j] -= learnRate_*(errQ+regRate_*regQ);
+            q_[m][j] -= learnRate_*(lossQ+regRate_*regQ);
         }
     }
     return false;
@@ -296,7 +332,7 @@ bool GDMsTrainer::trainImpl(int index) {
  *Return : the gradient value of p[i][m] about the 
  *         error function 
  */
-double SGDMsTrainer::errorFuncP(int i, int m, int j) {
+double SGDMsTrainer::lossFuncP(int i, int m, int j) {
     return (r_[i][j]-r1_[i][j])*(-q_[m][j]);
 }
 
@@ -313,7 +349,7 @@ double SGDMsTrainer::errorFuncP(int i, int m, int j) {
  *Return : the gradient value of q[m][j] about the 
  *         error function 
  */
-double SGDMsTrainer::errorFuncQ(int m, int j, int i) {
+double SGDMsTrainer::lossFuncQ(int m, int j, int i) {
     return (r_[i][j]-r1_[i][j])*(-p_[i][m]);
 }
 
@@ -359,29 +395,70 @@ double SGDMsTrainer::regularFuncQ(int m, int j) {
  *Return : true : training over; false : training continue
  */
 bool SGDMsTrainer::trainImpl(int index) {
+    printf ("index = %d\n", index);
     for (int i = 0; i < p_.getDimX(); ++i) {
     for (int j = 0; j < q_.getDimY(); ++j) {
         if (!r_[i][j]) {
             continue;
         }
+        r1_[i][j] = Matrixs<double>::mulLine(p_, q_, i, j) / factorNum_;
         for (int m = 0; m < factorNum_; ++m) {
-            double errP = errorFuncP(i, m, j);
-            double errQ = errorFuncQ(m, j, i);
+            double lossP = lossFuncP(i, m, j);
+            double lossQ = lossFuncQ(m, j, i);
             double regP = regularFuncP(i, m);
             double regQ = regularFuncQ(m, j);
-            p_[i][m] -= learnRate_*(errP+regRate_*regP);
-            q_[m][j] -= learnRate_*(errQ+regRate_*regQ);
+            p_[i][m] -= learnRate_*(lossP+regRate_*regP);
+            q_[m][j] -= learnRate_*(lossQ+regRate_*regQ);
         }
     }
     }
-    if (!(index % 100)) {
-        double err = Matrixs<double>::RMSE(r_, r1_);
-        if (err < errThr_) {
-            return true;
-        }
+    double deviation = deviationFunction();
+    printf ("count = %d, deviation = %lf\n", index, deviation);
+    if (deviation < errThr_) {
+        return true;
     }
     return false;
 }
 
 };
 
+#include <iostream>
+#include <stdlib.h>
+
+using namespace ys;
+
+double ran_uniform() {
+    return rand()/((double)RAND_MAX + 1);
+}
+
+int main() {
+    DMatrix<double> tmpR;
+    tmpR.setSize(100, 300);
+    for (int i = 0; i < 100; ++i) {
+        for (int j = 0; j < 300; ++j) {
+            if (rand()%100 < 90) {
+                tmpR[i][j] = 0;
+            }
+            else {
+                tmpR[i][j] = ran_uniform();                
+            }
+        }
+    }
+    tmpR.save("r.matrix");
+    SGDMsTrainer sgd;
+    sgd.setRFileName("r.matrix");
+    sgd.load(".");   
+    sgd.train();
+    sgd.save(".");
+    DMatrix<double> p;
+    DMatrix<double> q;
+    p.load("pfile");
+    q.load("qfile");
+    DMatrix<double> *r1 = Matrixs<double>::mul(p, q);
+    for (int i = 0; i < 100; ++i) {
+        for (int  j = 0; j < 300; ++j) {
+            printf ("%d     %d      %lf     %lf\n", i, j, tmpR[i][j], (*r1)[i][j]/10);
+        }
+    }
+    return 0;
+}

@@ -77,11 +77,11 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
         return 0;
     }
-    DMatrix<T>* result = new DMatrix<T>(dimX, dimY);
-    for (int i = 0; i < A.getDimY(); ++i) {
-        for (int j = 0; j < B.getDimX(); ++j) {
+    DMatrix<T>* result = new DMatrix<T>(A.getDimX(), B.getDimY());
+    for (int i = 0; i < A.getDimX(); ++i) {
+        for (int j = 0; j < B.getDimY(); ++j) {
             (*result)[i][j] = 0;
-            for (int k = 0; k < A.getDimX(); ++k) {
+            for (int k = 0; k < A.getDimY(); ++k) {
                 (*result)[i][j] += A[i][k] * B[k][j];
             }
         }
