@@ -7,15 +7,15 @@ double ran_uniform();
 namespace ys {
 MsTrainer::MsTrainer() {
     trainThr_ = 100000;
-    factorNum_ = 100;
-    errThr_ = 0.01;
+    factorNum_ = 10;
+    errThr_ = 0.001;
     regRate_ = 0.2;
     learnRate_ = 0.1;
     memcpy(rfileName_, "rfile", sizeof("rfile")); 
     rfileName_[sizeof("rfile")] = 0;
     memcpy(pfileName_, "pfile", sizeof("pfile")); 
     pfileName_[sizeof("pfile")] = 0;
-    memcpy(pfileName_, "qfile", sizeof("qfile")); 
+    memcpy(qfileName_, "qfile", sizeof("qfile")); 
     qfileName_[sizeof("qfile")] = 0;
 }
 
@@ -43,7 +43,7 @@ bool MsTrainer::save(char *path) {
     sprintf (fullpath, "%s/%s", path, pfileName_);
     bool ret1 = p_.save(fullpath);
     sprintf (fullpath, "%s/%s", path, qfileName_);
-    bool ret2 = q_.save(path);
+    bool ret2 = q_.save(fullpath);
     return (ret1 && ret2);
 }
 /*
@@ -395,13 +395,13 @@ double SGDMsTrainer::regularFuncQ(int m, int j) {
  *Return : true : training over; false : training continue
  */
 bool SGDMsTrainer::trainImpl(int index) {
+    printf ("index = %d\n", index);
     for (int i = 0; i < p_.getDimX(); ++i) {
     for (int j = 0; j < q_.getDimY(); ++j) {
         if (!r_[i][j]) {
             continue;
         }
-        r1_[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
-        printf ("r1_[i][j] = %lf\n", r1_[i][j]);
+        r1_[i][j] = Matrixs<double>::mulLine(p_, q_, i, j) / factorNum_;
         for (int m = 0; m < factorNum_; ++m) {
             double lossP = lossFuncP(i, m, j);
             double lossQ = lossFuncQ(m, j, i);
@@ -412,12 +412,10 @@ bool SGDMsTrainer::trainImpl(int index) {
         }
     }
     }
-    if (!(index % 100)) {
-        double deviation = deviationFunction();
-        printf ("count = %d, deviation = %lf\n", index, deviation);
-        if (deviation < errThr_) {
-            return true;
-        }
+    double deviation = deviationFunction();
+    printf ("count = %d, deviation = %lf\n", index, deviation);
+    if (deviation < errThr_) {
+        return true;
     }
     return false;
 }
@@ -435,9 +433,9 @@ double ran_uniform() {
 
 int main() {
     DMatrix<double> tmpR;
-    tmpR.setSize(1000, 10000);
-    for (int i = 0; i < 1000; ++i) {
-        for (int j = 0; j < 10000; ++j) {
+    tmpR.setSize(100, 300);
+    for (int i = 0; i < 100; ++i) {
+        for (int j = 0; j < 300; ++j) {
             if (rand()%100 < 90) {
                 tmpR[i][j] = 0;
             }
@@ -447,19 +445,20 @@ int main() {
         }
     }
     tmpR.save("r.matrix");
-    DMatrix<double> tmpR1;
-    tmpR1.load("r.matrix");
-    for (int i = 0; i < 1000; ++i) {
-        for (int j = 0; j < 10000; ++j) {
-            if (tmpR[i][j] != tmpR1[i][j]) {
-                printf ("error\n");
-            }
-        }
-    }
-    tmpR1.save("r1.matrix");
     SGDMsTrainer sgd;
     sgd.setRFileName("r.matrix");
     sgd.load(".");   
     sgd.train();
+    sgd.save(".");
+    DMatrix<double> p;
+    DMatrix<double> q;
+    p.load("pfile");
+    q.load("qfile");
+    DMatrix<double> *r1 = Matrixs<double>::mul(p, q);
+    for (int i = 0; i < 100; ++i) {
+        for (int  j = 0; j < 300; ++j) {
+            printf ("%d     %d      %lf     %lf\n", i, j, tmpR[i][j], (*r1)[i][j]/10);
+        }
+    }
     return 0;
 }
