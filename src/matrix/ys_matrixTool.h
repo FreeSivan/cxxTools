@@ -19,7 +19,7 @@ public:
     static T RMSE(const DMatrix<T>& A, const DMatrix<T>& B);
 };
 
-/*
+/*******************************************************************************
  *Summary: sum matrix A and matrix B
  *
  *Parameters:
@@ -32,7 +32,7 @@ public:
  *
  *      this function, it must be release by caller!!!!!
  *
- */
+ *******************************************************************************/
 template <typename T>
 DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
@@ -46,6 +46,21 @@ DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
     }
     return result;
 }
+
+/*******************************************************************************
+ *Summary: sum matrix A and matrix B
+ *
+ *Parameters:
+ *
+ *   const Matrix<T>& A : matrix A    
+ *
+ *   const Matrix<T>& B : matrix B
+ *
+ *Return : The pointer of the result matrix, a new object is allocated in 
+ *
+ *      this function, it must be release by caller!!!!!
+ *
+ *******************************************************************************/
 template <typename T>
 void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
@@ -59,7 +74,8 @@ void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     }
 }
 
-/*
+/*******************************************************************************
+ *
  *Summary: multiply matrix A and matrix B
  *
  *Parameters:
@@ -69,9 +85,10 @@ void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
  *   const Matrix<T>& B : matrix B
  *
  *Return : The pointer of the result matrix, a new object is allocated in 
-
+ *
  *      this function, it must be release by caller!!!!!
- */
+ *
+ *******************************************************************************/
 template <typename T>
 DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimY() != B.getDimX()) {
@@ -88,6 +105,22 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
     }
     return result;
 }
+
+/*******************************************************************************
+ *
+ *Summary: multiply matrix A and matrix B
+ *
+ *Parameters:
+ *
+ *   const Matrix<T>& A : matrix A    
+ *
+ *   const Matrix<T>& B : matrix B
+ *
+ *Return : The pointer of the result matrix, a new object is allocated in 
+ *
+ *      this function, it must be release by caller!!!!!
+ *
+ *******************************************************************************/
 template <typename T>
 void Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     if (A.getDimY() != B.getDimX()) {
@@ -104,7 +137,8 @@ void Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     }
 }
 
-/*
+/*******************************************************************************
+ *
  *Summary: matrix A minus matrix B
  *
  *Parameters:
@@ -114,9 +148,10 @@ void Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
  *   const Matrix<T>& B : matrix B
  *
  *Return : The pointer of the result matrix, a new object is allocated in 
-
+ *
  *      this function, it must be release by caller!!!!!
- */
+ *
+ *******************************************************************************/
 template <typename T>
 DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
@@ -130,6 +165,22 @@ DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
     }
     return result;
 }
+
+/*******************************************************************************
+ *
+ *Summary: matrix A minus matrix B
+ *
+ *Parameters:
+ *
+ *   const Matrix<T>& A : matrix A    
+ *
+ *   const Matrix<T>& B : matrix B
+ *
+ *Return : The pointer of the result matrix, a new object is allocated in 
+ *
+ *      this function, it must be release by caller!!!!!
+ *
+ *******************************************************************************/
 template <typename T>
 void Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
@@ -143,7 +194,8 @@ void Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
     }
 }
 
-/*
+/*******************************************************************************
+ *
  *Summary: 计算矩阵A的r行和矩阵B的c列的乘积
  *
  *Parameters:
@@ -153,7 +205,8 @@ void Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
  *   const Matrix<T>& B : 矩阵B
  *
  *Return : 矩阵A的r行和矩阵B的c列的乘积值
- */
+ *
+ *******************************************************************************/
 template <typename T>
 T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     if (A.getDimY() != B.getDimX()) {
@@ -167,7 +220,8 @@ T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
     return result;
 }
 
-/*
+/*******************************************************************************
+ *
  *Summary: 计算矩阵A和B的均方差
  *
  *Parameters:
@@ -177,7 +231,8 @@ T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
  *   const Matrix<T>& B : 矩阵B
  *
  *Return : 均方差的值
- */
+ *
+ *******************************************************************************/
 template <typename T>
 T Matrixs<T>::RMSE(const DMatrix<T>& A, const DMatrix<T>& B) {
     if (A.getDimX() != B.getDimX() || A.getDimY() != B.getDimY()) {
