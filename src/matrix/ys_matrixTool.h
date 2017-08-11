@@ -20,17 +20,16 @@ public:
 };
 
 /*******************************************************************************
- *Summary: sum matrix A and matrix B
  *
- *Parameters:
+ *  Summary: 计算矩阵A和矩阵B的加和，矩阵A和矩阵B必须行数列数相同
  *
- *   const Matrix<T>& A : matrix A    
+ *  Parameters:
  *
- *   const Matrix<T>& B : matrix B
+ *      const Matrix<T>& A : 矩阵A    
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
+ *      const Matrix<T>& B : 矩阵B
  *
- *      this function, it must be release by caller!!!!!
+ *  Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放 
  *
  *******************************************************************************/
 template <typename T>
@@ -48,17 +47,18 @@ DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
 }
 
 /*******************************************************************************
- *Summary: sum matrix A and matrix B
  *
- *Parameters:
+ *  Summary: 计算矩阵A和矩阵B的加和，通过传出参数C传出
  *
- *   const Matrix<T>& A : matrix A    
+ *  Parameters:
  *
- *   const Matrix<T>& B : matrix B
+ *      const Matrix<T>& A : 矩阵A   
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
+ *      const Matrix<T>& B : 矩阵B
  *
- *      this function, it must be release by caller!!!!!
+ *      DMatrix<T>& C : 矩阵C，传出A+B的结果
+ *
+ *  Return : 没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
@@ -76,17 +76,15 @@ void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
 
 /*******************************************************************************
  *
- *Summary: multiply matrix A and matrix B
+ *  Summary: 计算矩阵A和矩阵B的乘机，矩阵A的列数必须等于矩阵B的行数
  *
- *Parameters:
+ *  Parameters:
  *
- *   const Matrix<T>& A : matrix A    
+ *      const Matrix<T>& A : 矩阵A   
  *
- *   const Matrix<T>& B : matrix B
+ *      const Matrix<T>& B : 矩阵B
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
- *
- *      this function, it must be release by caller!!!!!
+ *  Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
  *
  *******************************************************************************/
 template <typename T>
@@ -108,17 +106,17 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
 
 /*******************************************************************************
  *
- *Summary: multiply matrix A and matrix B
+ *  Summary: 矩阵A和矩阵B相乘，结果通过传出参数矩阵C传出
  *
- *Parameters:
+ *  Parameters:
  *
- *   const Matrix<T>& A : matrix A    
+ *      const Matrix<T>& A : 矩阵A    
  *
- *   const Matrix<T>& B : matrix B
+ *      const Matrix<T>& B : 矩阵B
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
+ *      DMatrix<T>& C : 传出参数矩阵C
  *
- *      this function, it must be release by caller!!!!!
+ *  Return : 没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
@@ -139,17 +137,15 @@ void Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
 
 /*******************************************************************************
  *
- *Summary: matrix A minus matrix B
+ *Summary: 计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
  *
  *Parameters:
  *
- *   const Matrix<T>& A : matrix A    
+ *   const Matrix<T>& A : 矩阵A    
  *
- *   const Matrix<T>& B : matrix B
+ *   const Matrix<T>& B : 矩阵B
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
- *
- *      this function, it must be release by caller!!!!!
+ *Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
  *
  *******************************************************************************/
 template <typename T>
@@ -168,17 +164,17 @@ DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
 
 /*******************************************************************************
  *
- *Summary: matrix A minus matrix B
+ *Summary: 计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
  *
  *Parameters:
  *
- *   const Matrix<T>& A : matrix A    
+ *   const Matrix<T>& A : 矩阵A   
  *
- *   const Matrix<T>& B : matrix B
+ *   const Matrix<T>& B : 矩阵B
  *
- *Return : The pointer of the result matrix, a new object is allocated in 
+ *   DMatrix<T>& C : 传出参数矩阵C
  *
- *      this function, it must be release by caller!!!!!
+ *Return : 没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
