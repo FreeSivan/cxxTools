@@ -2,7 +2,7 @@
 
 namespace ys {
 
-/*********************************************
+/*****************************************************
  *Summary: 神经元base类析构函数
  *      
  *      申请weight_的内存，不申请input_
@@ -15,7 +15,7 @@ namespace ys {
  *
  *Return : 无
  *
- ********************************************/
+ ****************************************************/
 BPNode::BPNode(int wNum) {
     wNum_ = wNum;
     weight_ = new double[wNum_];
@@ -23,7 +23,7 @@ BPNode::BPNode(int wNum) {
     output_ = bias_ = sum_ = 0;
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 神经元base类析构函数
  *      
  *      负责释放weight_数组，不释放input_
@@ -36,12 +36,12 @@ BPNode::BPNode(int wNum) {
  *
  *Return : 无
  *
- ********************************************/
+ ****************************************************/
 BPNode::~BPNode() {
     delete[] weight_;
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 加和函数
  *      
  *      计算神经元输入关于权重的加权和
@@ -51,7 +51,7 @@ BPNode::~BPNode() {
  *      无
  *
  *Return : 输入*权重+偏置
- ********************************************/
+ ****************************************************/
 double BPNode::additiveFunc() {
     if (!weight_ || !input_) {
         return -1;
@@ -64,7 +64,7 @@ double BPNode::additiveFunc() {
     return sum_;
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 激活函数
  *      
  *      将神经元的输出经过激活函数
@@ -74,12 +74,12 @@ double BPNode::additiveFunc() {
  *      无
  *
  *Return : 经过激活函数计算神经元最后输出值
- *********************************************/
+ *****************************************************/
 double BPNode::activationFunc() {
     
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 加和函数关于输入的偏导函数
  *      
  *      计算第pos个输入关于加和函数的偏导值
@@ -90,7 +90,7 @@ double BPNode::activationFunc() {
  *
  *Return : 第pos个输入关于加和函数的偏导值
  *
- *********************************************/
+ *****************************************************/
 double BPNode::derivativeI(int pos) {
     if (!weight_) {
         return -1;
@@ -98,7 +98,7 @@ double BPNode::derivativeI(int pos) {
     return weight_[pos];
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 加和函数关于权重的偏导函数
  *      
  *      计算第pos个权重关于加和函数的偏导值
@@ -109,7 +109,7 @@ double BPNode::derivativeI(int pos) {
  *
  *Return : 第pos个权重关于加和函数的偏导值
  *
- *********************************************/
+ *****************************************************/
 double BPNode::derivativeW(int pos) {
     if (!input_) {
         return -1;
@@ -117,7 +117,7 @@ double BPNode::derivativeW(int pos) {
     return input_[pos];
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 获取神经元的第index个权重
  *
  *Parameters:
@@ -126,7 +126,7 @@ double BPNode::derivativeW(int pos) {
  *
  *Return : 神经元第index个权重值
  *
- *********************************************/
+ *****************************************************/
 double BPNode::getWeight(int index) {
     if (index >= weight_ || !weight_) {
         return -1;
@@ -134,7 +134,7 @@ double BPNode::getWeight(int index) {
     return weight_[index];
 }
 
- /*********************************************
+ /*****************************************************
   *Summary: 获取神经元的第index个权重
   *
   *Parameters:
@@ -143,7 +143,7 @@ double BPNode::getWeight(int index) {
   *
   *Return : 神经元第index个权重值
   *
-  *********************************************/
+  *****************************************************/
 BPLayer::BPLayer(int iNum, int oNum, int index) {
     inputNum_ = iNum;
     outputNum_ = oNum;
@@ -155,7 +155,7 @@ BPLayer::BPLayer(int iNum, int oNum, int index) {
     }
 }
 
-/*********************************************
+/*****************************************************
  *Summary: 获取神经元的第index个权重
  *
  *Parameters:
@@ -164,21 +164,21 @@ BPLayer::BPLayer(int iNum, int oNum, int index) {
  *
  *Return : 神经元第index个权重值
  *
- *********************************************/
+ *****************************************************/
 BPLayer::~BPLayer() {
     // TODO
 }
 
-/*********************************************
- *Summary: 获取神经元的第index个权重
+/*****************************************************
+ *Summary: 获取本层第index个神经元的输出
  *
  *Parameters:
  *
- *      int index : 带获取的权重的编号
+ *      int index : 神经元编号
  *
- *Return : 神经元第index个权重值
+ *Return : 编号为index的神经元的输出
  *
- *********************************************/
+ *****************************************************/
 double BPLayer::getOutput(int index) const {
     if (index >= outputNum_ || !node_) {
         return -1;
@@ -189,16 +189,16 @@ double BPLayer::getOutput(int index) const {
     return node_[index]->output_;
 }
 
-/*********************************************
- *Summary: 获取神经元的第index个权重
+/*****************************************************
+ *Summary: 获取本层编号为index的神经元的加和函数结果
  *
  *Parameters:
  *
- *      int index : 带获取的权重的编号
+ *      int index : 神经元编号
  *
- *Return : 神经元第index个权重值
+ *Return : 编号为index的神经元的加和函数结果
  *
- *********************************************/
+ *****************************************************/
 double BPLayer::getAdditive(int index) const {
     if (index >= outputNum_ || !node_) {
         return -1;
@@ -209,16 +209,18 @@ double BPLayer::getAdditive(int index) const {
     return node_[index]->sum_;
 }
 
-/*********************************************
- *Summary: 获取神经元的第index个权重
+/*****************************************************
+ *Summary: 获取编号为oIndex的神经元的第wIndex个权重
  *
  *Parameters:
  *
- *      int index : 带获取的权重的编号
+ *      int oIndex : 神经元编号
  *
- *Return : 神经元第index个权重值
+ *      int wIndex : 权重编号
  *
- *********************************************/
+ *Return : 编号为oIndex的神经元的第wIndex个权重
+ *
+ *****************************************************/
 double BPLayer::getWeight(int oIndex, int wIndex) {
     if (oIndex >= outputNum_ || !node_) {
         return -1;
@@ -229,30 +231,30 @@ double BPLayer::getWeight(int oIndex, int wIndex) {
     return node_[oIndex]->getWeight(wIndex);
 }
 
-/*********************************************
- *Summary: 获取神经元的第index个权重
+/*****************************************************
+ *Summary: 获取本层在神经网络中的编号
  *
  *Parameters:
  *
- *      int index : 带获取的权重的编号
+ *      无
  *
- *Return : 神经元第index个权重值
+ *Return : 本层在神经网络中的编号
  *
- *********************************************/
+ *****************************************************/
 double BPLayer::getLayerIndex() const {
     return layerIndex_;
 }
 
-/*********************************************
- *Summary: 获取神经元的第index个权重
+/*****************************************************
+ *Summary: 前向函数，是本层的所有神经元进行前向计算
  *
  *Parameters:
  *
- *      int index : 带获取的权重的编号
+ *      无
  *
- *Return : 神经元第index个权重值
+ *Return : 无
  *
- *********************************************/
+ *****************************************************/
 bool BPLayer::forward() {
     if (!input_ || !node_) {
         return false;
