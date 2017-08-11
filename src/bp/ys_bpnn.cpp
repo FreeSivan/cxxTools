@@ -65,21 +65,6 @@ double BPNode::additiveFunc() {
 }
 
 /*****************************************************
- *Summary: 激活函数
- *      
- *      将神经元的输出经过激活函数
- *
- *Parameters:
- *
- *      无
- *
- *Return : 经过激活函数计算神经元最后输出值
- *****************************************************/
-double BPNode::activationFunc() {
-    
-}
-
-/*****************************************************
  *Summary: 加和函数关于输入的偏导函数
  *      
  *      计算第pos个输入关于加和函数的偏导值
@@ -134,16 +119,77 @@ double BPNode::getWeight(int index) {
     return weight_[index];
 }
 
- /*****************************************************
-  *Summary: 获取神经元的第index个权重
-  *
-  *Parameters:
-  *
-  *      int index : 带获取的权重的编号
-  *
-  *Return : 神经元第index个权重值
-  *
-  *****************************************************/
+/*****************************************************
+ *Summary: 激活函数
+ *      
+ *      将神经元的输出经过激活函数
+ *
+ *Parameters:
+ *
+ *      无
+ *
+ *Return : 经过激活函数计算神经元最后输出值
+ *****************************************************/
+double BPNodeLinear::activationFunc() {
+    output_ = sum_;
+    return output_;
+}
+
+/*****************************************************
+ *Summary: 激活函数
+ *      
+ *      将神经元的输出经过激活函数
+ *
+ *Parameters:
+ *
+ *      无
+ *
+ *Return : 经过激活函数计算神经元最后输出值
+ *****************************************************/
+double BPNodeLinear::derivativeActiation() {
+    
+}
+
+/*****************************************************
+ *Summary: 激活函数
+ *      
+ *      将神经元的输出经过激活函数
+ *
+ *Parameters:
+ *
+ *      无
+ *
+ *Return : 经过激活函数计算神经元最后输出值
+ *****************************************************/
+double BPNodeLinear::activationFunc() {
+    
+}
+
+/*****************************************************
+ *Summary: 激活函数
+ *      
+ *      将神经元的输出经过激活函数
+ *
+ *Parameters:
+ *
+ *      无
+ *
+ *Return : 经过激活函数计算神经元最后输出值
+ *****************************************************/
+double BPNodeLinear::derivativeActiation() {
+    
+}
+
+/*****************************************************
+ *Summary: 获取神经元的第index个权重
+ *
+ *Parameters:
+ *
+ *      int index : 带获取的权重的编号
+ *
+ *Return : 神经元第index个权重值
+ *
+ *****************************************************/
 BPLayer::BPLayer(int iNum, int oNum, int index) {
     inputNum_ = iNum;
     outputNum_ = oNum;
@@ -256,16 +302,51 @@ double BPLayer::getLayerIndex() const {
  *
  *****************************************************/
 bool BPLayer::forward() {
-    if (!input_ || !node_) {
+    if (!input_ || !node_ || !output_) {
         return false;
     }
-    for (int i = 0; i < inputNum_; ++i) {
-        input_[i] = lLink_->getOutput(i);
+    for (int i = 0; i < outputNum_; ++i) {
+        node_[i]->input_ = input_;
+        node_[i]->additiveFunc();
+        output_[i] = activationFunc(node_[i]->sum_);
     }
-    for (int i = 0; i < outputNum_; ++i) {        
-        node_[i]->additiveFunc()
-        node_[i]->activationFunc();
+}
+
+bool BPNet::forward() {
+    lay_[0]->input_ = input_;
+    for (int i = 1; i < layNum_; ++i) {
+        lay_[i]->input_ = lay_[i-1]->input_;
+        lay_[i]->forward();
     }
+    for (int i = 0; i < outputNum_; ++i) {
+        output_[i] = lay_[layNum_-1]->output_[i];
+    }
+}
+
+void BPNode::countWeight(double der) {
+    for (int i = 0; i < wNum_; ++i) {
+        weight_[i] -= der * derivativeAdditiveW(i);
+    }
+}
+
+bool BPLayer::backward() {
+    for (int i = 0; i < outputNum_; ++i) {
+        double derS = routput_[i]*derivativeActiation(); // TODO
+        node_[i]->countWeight(derS);
+        for (int j = 0; j < inputNum_; ++j) {
+            rinput_[i] += derS * node_[i]->derivativeAdditiveI(i);
+        }
+    }
+}
+
+bool BPNet::backward() {
+    lay_[layNum_-1].routput_ = routput_;
+    lay_[layNum_-1].backward();
+    for (int i = layNum_-2; i >= 0; --i) {
+        lay_[i]->routput_ = lay_[i]->rinput_;
+        lay_[i]->backward();
+    }
+
 }
 
 }

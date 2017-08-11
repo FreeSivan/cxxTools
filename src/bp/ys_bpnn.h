@@ -9,22 +9,18 @@ class BPNet;
 class BPNode {
 public:
     BPNode(int wNum);
-    ~BPNode();
+    virtual ~BPNode();
     friend class BPLayer;
-public:
-    double additiveFunc();
-    double derivativeAdditiveW(int pos);
-    double derivativeAdditiveI(int pos);
-    double getWeight(int index) const;
-public:
-    virtual double activationFunc();
-    virtual double derivativeActiation();
+protected:
+    void additiveFunc();
+    void countWeight(double der);
+    void derivativeAdditiveW(int pos);
+    void derivativeAdditiveI(int pos);
 protected:
     int wNum_;          // 权值参数维度
     double *weight_;    // 指向权值数组的指针
     double *input_;     // 指向输入数组的指针
-    double output_;     // 节点最后输出
-    double bias_;       // 偏置项
+    double bias_;       // 神经单元偏置项
     double sum_;        // 输入的加权和
 private:
     BPNode(const BPNode&);
@@ -37,17 +33,23 @@ public:
     virtual ~BPLayer();
     friend class BPNet;
 public:
-    virtual void forward();
-    
+    bool forward();
+    void backward();
 public:
     double getOutput(int index) const;
     double getAdditive(int index) const;
     double getWeight(int oIndex, int wIndex) const;
     double getLayerIndex() const;
+protected:
+    virtual double activationFunc(double value);
+    virtual double derivativeActiation();
 private:
     int inputNum_;      // 输入维度==权重维度
     int outputNum_;     // 输出维度==本层节点个数
-    double *input_;     // 输入数组，存放本层输入
+    double *input_;     // 输入指针，指向本层输入
+    double *output_;    // 输出数组，存放本层输出
+    double *rinput_;    // 损失函数对本层输入的偏导值
+    double *routput_;   // 损失函数对本层输出的偏导值
     BPNode **node_;     // 本层节点数组
     BPLayer *lLink_;    // 指向前一层的指针
     BPLayer *rLink_;    // 指向后一层的指针
@@ -63,17 +65,22 @@ public:
     virtual ~BPNet();
 public:
     bool addLayer();
+    bool forward();
+    bool backward();
 public:
-    virtual double lossFunc();
     virtual double errorFunc();
-    virtual double regularFunc();
+    virtual double lossFunc(double input);
+    virtual double regularFunc(double input);
 private:
-    int layNum_;        // 圣经网络层数
+    int layNum_;        // 神经网络层数
     int inputNum_;      // 神经网络输入维度
     int outputNum_;     // 神经网络输出维度
-    BPLayer *lay_;      // 节点层的数组
-    double lRate_;      // 学习率
-    double rRate_;      // 正则率
+    double *input_;     // 神经网络的输入
+    double *output_;    // 神经网络的输出
+    double *routput_;   // 损失函数对输出的偏导值
+    BPLayer **lay_;     // 节点层的数组
+    double lRate_;      // 神经网络学习率
+    double rRate_;      // 神经网络正则率
 };
 
 }
