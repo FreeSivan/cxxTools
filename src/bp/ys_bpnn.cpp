@@ -312,6 +312,120 @@ bool BPLayer::backward() {
 
 /***********************************************************
  *
+ *  Summary: 设置当前网络层的输入input
+ *
+ ***********************************************************/
+void BPLayer::setInput(double *input) {
+    input_ = input;
+}
+
+/***********************************************************
+ *
+ *  Summary: 设置损失函数对当前网络层各个输出的偏导值数组
+ *
+ ***********************************************************/
+void BPLayer::setROutput(double *routput) {
+    routput_ = routput;
+}
+
+/***********************************************************
+ *
+ *  Summary: 获取当前网络层的输出数组
+ *
+ ***********************************************************/
+double* BPLayer::getOutput() const {
+    return output_;
+}
+
+/***********************************************************
+ *
+ *  Summary: 获得损失函数对当前层的输入的偏导数组
+ *
+ ***********************************************************/
+double* BPLayer::getRInput() const {
+    return rinput_;
+}
+
+/***********************************************************
+ *
+ *  Summary: 默认激活函数，线性函数
+ *
+ ***********************************************************/
+double active(double value) {
+    return value;
+}
+
+/***********************************************************
+ *
+ *  Summary: 默认激活函数的导函数，线性函数的导函数
+ *
+ ***********************************************************/
+double ractive(double value) {
+    return 1;
+}
+
+int layNum_;        // 神经网络层数
+int inputNum_;      // 神经网络输入维度
+int outputNum_;     // 神经网络输出维度
+double *input_;     // 神经网络的输入
+double *output_;    // 神经网络的输出
+double *routput_;   // 损失函数对输出的偏导值
+BPLayer **lay_;     // 节点层的数组
+double lRate_;      // 神经网络学习率
+double rRate_;      // 神经网络正则率
+
+/***********************************************************
+ *
+ *  Summary: 
+ *             
+ *      申请input_内存用于存放神经网络的输入
+ *      
+ *      申请output_内存用于存放神经网络的输出
+ *
+ *      申请routput_内存存放损失函数对输出的偏导
+ *
+ *      申请lay_内存用于存放神经网络的各层
+ *
+ *  Parameters:
+ *
+ *      int layNum : 神经网络层数
+ *      
+ *      int iNum : 神经网络输入维度
+ *
+ *      int oNum : 神经网络输出维度
+ *
+ **********************************************************/
+BPNet::BPNet(int layNum, int iNum, int oNum) {
+    layNum_ = layNum;
+    inputNum_ = iNum;
+    outputNum_ = oNum;
+    input_ = new double[iNum];
+    output_ = new double[oNum];
+    routput_ = new double[oNum];
+    lay_ = new BPLayer*[layNum_];
+}
+
+/***********************************************************
+ *
+ *  Summary: 
+ *      
+ *      释放input_, output_, routput_;
+ *
+ *      释放每个lay，最后释放lay_
+ * 
+ ***********************************************************/
+BPNet::~BPNet() {
+    delete[] input_;
+    delete[] output_;
+    delete[] routput_;
+    for (int i = 0; i < layNum_; ++i) {
+        delete lay_[i];
+    }
+    delete[] lay_;
+}
+
+/***********************************************************
+ *
  *  Summary: 
  *
  *      前向函数，使本网络的所有层次的依次forward
@@ -334,38 +448,62 @@ bool BPLayer::backward() {
  *      
  ***********************************************************/
 bool BPNet::forward() {
-    lay_[0]->input_ = input_;
+    lay_[0]->setInput(input_);
     if (!lay_[0]->forward()) {
         return false;
     }
     for (int i = 1; i < layNum_; ++i) {
-        lay_[i]->input_ = lay_[i-1]->input_;
-        if !lay_[i]->forward()) {
+        lay_[i]->setInput(lay_[i-1]->getOutput());
+        if (!lay_[i]->forward()) {
             return false;
         }
     }
     for (int i = 0; i < outputNum_; ++i) {
-        output_[i] = lay_[layNum_-1]->output_[i];
+        output_[i] = lay_[layNum_-1]->getOutput();
     }
     return true;
 }
 
-void BPNode::countWeight(double der) {
-    for (int i = 0; i < wNum_; ++i) {
-        weight_[i] -= der * derivativeAdditiveW(i);
-    }
-}
-
-
-
+/***********************************************************
+ *
+ *  Summary: 
+ *
+ *      后向函数，使本网络的所有层次的依次backward
+ *
+ *      计算损失函数对每一个输出的偏导值，保存于routput_
+ *      
+ *      然后逐层往前迭代，执行backward函数
+ *
+ *  setp:
+ *     
+ *      1. 计算损失函数对每个输出的偏导值，保存于routput_
+ *      
+ *      2. 将routput_设置到最后一层，并执行其backward
+ *      
+ *      3. 迭代各层，每一层的routput设置为前一层的rinput_
+ *      
+ *      4. 每一层都调用backward函数，直至第一层
+ *
+ *  return:
+ *      
+ *      true: 执行成功； false: 执行失败
+ *      
+ ***********************************************************/
 bool BPNet::backward() {
-    lay_[layNum_-1].routput_ = routput_;
-    lay_[layNum_-1].backward();
-    for (int i = layNum_-2; i >= 0; --i) {
-        lay_[i]->routput_ = lay_[i]->rinput_;
-        lay_[i]->backward();
+    for (int i = 0 ; i< outputNum_; ++i) {
+        routput_[i] = lossFunc(output_[i]);
     }
-
+    lay_[layNum_-1].setROutput(routput_);
+    if (!lay_[layNum_-1].backward()) {
+        return false;
+    }
+    for (int i = layNum_-2; i >= 0; --i) {
+        if (!lay_[i]->backward()) {
+            return false;
+        }
+        lay_[i]->setROutput(lay_[i+1]->getRInput());
+    }
+    return true;
 }
 
 }

@@ -67,13 +67,10 @@ public:
     BPNet(int layNum, int iNum, int oNum);
     virtual ~BPNet();
 public:
-    bool addLayer();
     bool forward();
     bool backward();
 public:
-    virtual double errorFunc();
-    virtual double lossFunc(double input);
-    virtual double regularFunc(double input);
+    virtual double lossFunc(double value);
 private:
     int layNum_;        // 神经网络层数
     int inputNum_;      // 神经网络输入维度
