@@ -2,325 +2,352 @@
 
 namespace ys {
 
-/*****************************************************
- *Summary: 神经元base类析构函数
- *      
- *      申请weight_的内存，不申请input_
+/***********************************************************
  *
- *      input_在layer层申请
+ *  Summary: 
+ *             
+ *      申请weight_的内存，保存本节点的权值
  *
- *Parameters:
+ *      不申请input_的内存，直接指向BPLay的input_
  *
- *      无
+ *  Parameters:
  *
- *Return : 无
+ *      int wNum : 本层权重维度，也是输入维度
  *
- ****************************************************/
+ **********************************************************/
 BPNode::BPNode(int wNum) {
     wNum_ = wNum;
     weight_ = new double[wNum_];
     input_ = NULL;
-    output_ = bias_ = sum_ = 0;
+    bias_ = sum_ = 0;
+    dersum_ = 0;
+    lRate_ = 0;
 }
 
-/*****************************************************
- *Summary: 神经元base类析构函数
- *      
+/***********************************************************
+ *
+ *  Summary: 
+ *    
  *      负责释放weight_数组，不释放input_
  *
  *      input_在layer层维护，神经元只读访问
  *
- *Parameters:
- *
- *      无
- *
- *Return : 无
- *
- ****************************************************/
+ **********************************************************/
 BPNode::~BPNode() {
     delete[] weight_;
 }
 
-/*****************************************************
- *Summary: 加和函数
+/***********************************************************
+ *
+ *  Summary: 
+ *
+ *      前向计算，是一个加和函数
  *      
  *      计算神经元输入关于权重的加权和
  *
- *Parameters:
+ *  Return : 
+ *      
+ *      true: 执行成功； false: 执行失败
  *
- *      无
- *
- *Return : 输入*权重+偏置
- ****************************************************/
-double BPNode::additiveFunc() {
+ **********************************************************/
+bool BPNode::forward() {
     if (!weight_ || !input_) {
-        return -1;
+        return false;
     }
     sum_ = 0;
     for (int i = 0; i < wNum_; ++i) {
         sum_ += weight_[i] * input_[i];
     }
     sum_ += bias_;
-    return sum_;
+    return true;
 }
 
-/*****************************************************
- *Summary: 加和函数关于输入的偏导函数
- *      
- *      计算第pos个输入关于加和函数的偏导值
+/***********************************************************
  *
- *Parameters:
+ *  Summary: 
+ *
+ *      后向计算，在损失函数负梯度方向更新每一个权重
+ *      
+ *  Return : 
+ *      
+ *      true: 执行成功； false: 执行失败
+ *
+ **********************************************************/
+bool BPNode::backward() {
+    for (int i = 0; i < wNum_; ++i) {
+        if (-1 == rsumW(i)) {
+            return false;
+        }
+        weight_[i] -=  lRate_ * dersum_* rsumW(i);
+    }
+    return true;
+}
+
+/***********************************************************
+ *
+ *  Summary: 
+ *
+ *      加和函数关于输入的偏导函数
+ *      
+ *      计算第pos个输入关于加和函数的梯度值
+ *
+ *  Parameters:
  *
  *      int pos : 输入的编号
  *
- *Return : 第pos个输入关于加和函数的偏导值
+ *  Return : 
+ *      
+ *      第pos个输入关于加和函数的偏导值
  *
- *****************************************************/
-double BPNode::derivativeI(int pos) {
-    if (!weight_) {
+ ***********************************************************/
+double BPNode::rsumI(int pos) {
+    if (!weight_ || pos >= wNum_) {
         return -1;
     }
     return weight_[pos];
 }
 
-/*****************************************************
- *Summary: 加和函数关于权重的偏导函数
- *      
- *      计算第pos个权重关于加和函数的偏导值
+/***********************************************************
  *
- *Parameters:
+ *  Summary: 
+ *
+ *      加和函数关于权重的偏导函数
+ *      
+ *      计算第pos个权重关于加和函数的梯度值
+ *
+ *  Parameters:
  *
  *      int pos : 权重的编号
  *
- *Return : 第pos个权重关于加和函数的偏导值
+ *  Return : 
  *
- *****************************************************/
-double BPNode::derivativeW(int pos) {
-    if (!input_) {
+ *      第pos个权重关于加和函数的偏导值
+ *
+ ***********************************************************/
+double BPNode::rsumW(int pos) {
+    if (!input_ || pos >= wNum_) {
         return -1;
     }
     return input_[pos];
 }
 
-/*****************************************************
- *Summary: 获取神经元的第index个权重
+/***********************************************************
  *
- *Parameters:
+ *  Summary: 设置输入数组
  *
- *      int index : 带获取的权重的编号
- *
- *Return : 神经元第index个权重值
- *
- *****************************************************/
-double BPNode::getWeight(int index) {
-    if (index >= weight_ || !weight_) {
-        return -1;
-    }
-    return weight_[index];
+ ***********************************************************/
+void BPNode::setInput(double *input) {
+    input_ = input;
 }
 
-/*****************************************************
- *Summary: 激活函数
+/***********************************************************
+ *
+ *  Summary: 设置损失函数L对加和值sum_的偏导值
+ *
+ ***********************************************************/
+void BPNode::setDersum(double dersum) {
+    dersum_ = dersum;
+}
+
+/***********************************************************
+ *
+ *  Summary: 设置模型的学习率，用于迭代权重
+ *
+ ***********************************************************/
+void BPNode::setLRate(double lRate) {
+    lRate_ = lRate;
+}
+
+/***********************************************************
+ *
+ *  Summary: 获取神经元的加和值
+ *
+ ***********************************************************/
+double BPNode::getSum() const {
+    return sum_;
+}
+
+/***********************************************************
+ *
+ * Summary: 
  *      
- *      将神经元的输出经过激活函数
+ *      Layer节点分配node_，output_，rinput_的内存
  *
- *Parameters:
+ *      其中node_保存本层所有node
  *
- *      无
+ *      output_保存本层所有的输出
  *
- *Return : 经过激活函数计算神经元最后输出值
- *****************************************************/
-double BPNodeLinear::activationFunc() {
-    output_ = sum_;
-    return output_;
-}
-
-/*****************************************************
- *Summary: 激活函数
- *      
- *      将神经元的输出经过激活函数
+ *      rinput_保存损失函数对本层所有输入的偏导值
  *
- *Parameters:
+ *      input_不分配内存，直接指向前一层的output_
  *
- *      无
+ *      routput_不分配内存，直接指向前一层的rinput_
  *
- *Return : 经过激活函数计算神经元最后输出值
- *****************************************************/
-double BPNodeLinear::derivativeActiation() {
-    
-}
-
-/*****************************************************
- *Summary: 激活函数
- *      
- *      将神经元的输出经过激活函数
+ * Parameters:
  *
- *Parameters:
+ *      int iNum : 输入维度，也是本层节点权值维度 
  *
- *      无
+ *      int oNum : 输出维度，也是本层节点个数
  *
- *Return : 经过激活函数计算神经元最后输出值
- *****************************************************/
-double BPNodeLinear::activationFunc() {
-    
-}
-
-/*****************************************************
- *Summary: 激活函数
- *      
- *      将神经元的输出经过激活函数
- *
- *Parameters:
- *
- *      无
- *
- *Return : 经过激活函数计算神经元最后输出值
- *****************************************************/
-double BPNodeLinear::derivativeActiation() {
-    
-}
-
-/*****************************************************
- *Summary: 获取神经元的第index个权重
- *
- *Parameters:
- *
- *      int index : 带获取的权重的编号
- *
- *Return : 神经元第index个权重值
- *
- *****************************************************/
-BPLayer::BPLayer(int iNum, int oNum, int index) {
+ ***********************************************************/
+BPLayer::BPLayer(int iNum, int oNum) {
     inputNum_ = iNum;
     outputNum_ = oNum;
-    layerIndex_ = index;
-    lLink_ = rLink_ = NULL;
-    node_ = new BPNode*[oNum];
-    for (int i = 0; i < oNum; ++i) {
-        BPNode[i] = NULL;
+    input_ = NULL;
+    routput_ = NULL;
+    output_ = new double[outputNum_];
+    rinput_ = new double[inputNum_];
+    node_ = new node_*[outputNum_];
+    for (int i = 0; i < outputNum_; ++i) {
+        node_[i] = new BPNode(inputNum_);
     }
 }
 
-/*****************************************************
- *Summary: 获取神经元的第index个权重
+/***********************************************************
  *
- *Parameters:
+ *  Summary: 
+ *      
+ *      释放每个node节点，释放node数组
  *
- *      int index : 带获取的权重的编号
+ *      释放output_数组，释放rinput_数组
+ * 
+ *      input_和routput_不是自己申请，不需要释放
  *
- *Return : 神经元第index个权重值
- *
- *****************************************************/
+ ***********************************************************/
 BPLayer::~BPLayer() {
-    // TODO
+    for (int i = 0; i < outputNum_; ++i) {
+        delete node_[i];
+    }
+    delete[] node_;
+    delete[] output_;
+    delete[] rinput_;
 }
 
-/*****************************************************
- *Summary: 获取本层第index个神经元的输出
+/***********************************************************
  *
- *Parameters:
+ *  Summary: 
+ *  
+ *      前向函数，本层的所有神经元进行前向计算
  *
- *      int index : 神经元编号
+ *  setp:
+ *     
+ *      1. 迭代本层每个节点node_[i]
+ *      
+ *      2. 为每个node设置输入input
+ *      
+ *      3. 调用每个node的forward
+ *      
+ *      4. 获取每个node的sum值保存在output
  *
- *Return : 编号为index的神经元的输出
- *
- *****************************************************/
-double BPLayer::getOutput(int index) const {
-    if (index >= outputNum_ || !node_) {
-        return -1;
-    }
-    if (node_[index]) {
-        return -1;
-    }
-    return node_[index]->output_;
-}
-
-/*****************************************************
- *Summary: 获取本层编号为index的神经元的加和函数结果
- *
- *Parameters:
- *
- *      int index : 神经元编号
- *
- *Return : 编号为index的神经元的加和函数结果
- *
- *****************************************************/
-double BPLayer::getAdditive(int index) const {
-    if (index >= outputNum_ || !node_) {
-        return -1;
-    }
-    if (node_[index]) {
-        return -1;
-    }
-    return node_[index]->sum_;
-}
-
-/*****************************************************
- *Summary: 获取编号为oIndex的神经元的第wIndex个权重
- *
- *Parameters:
- *
- *      int oIndex : 神经元编号
- *
- *      int wIndex : 权重编号
- *
- *Return : 编号为oIndex的神经元的第wIndex个权重
- *
- *****************************************************/
-double BPLayer::getWeight(int oIndex, int wIndex) {
-    if (oIndex >= outputNum_ || !node_) {
-        return -1;
-    }
-    if (!node_[oIndex]) {
-        return -1;
-    }
-    return node_[oIndex]->getWeight(wIndex);
-}
-
-/*****************************************************
- *Summary: 获取本层在神经网络中的编号
- *
- *Parameters:
- *
- *      无
- *
- *Return : 本层在神经网络中的编号
- *
- *****************************************************/
-double BPLayer::getLayerIndex() const {
-    return layerIndex_;
-}
-
-/*****************************************************
- *Summary: 前向函数，是本层的所有神经元进行前向计算
- *
- *Parameters:
- *
- *      无
- *
- *Return : 无
- *
- *****************************************************/
+ *  return:
+ *      
+ *      true: 执行成功； false: 执行失败
+ *      
+ ***********************************************************/
 bool BPLayer::forward() {
     if (!input_ || !node_ || !output_) {
         return false;
     }
     for (int i = 0; i < outputNum_; ++i) {
-        node_[i]->input_ = input_;
-        node_[i]->additiveFunc();
-        output_[i] = activationFunc(node_[i]->sum_);
+        node_[i]->setInput(input_);
+        node_[i]->forward();
+        output_[i] = node_[i].getSum();
     }
+    return true;
 }
 
+/***********************************************************
+ *
+ *  Summary: 
+ *  
+ *      后向函数，使本层的所有神经元进行后向计算，
+ *
+ *      routput_保存损失函数对本层每个节点输出的偏导，
+ *
+ *      通过routput_[i]计算损失函数对每个节点的sum值
+ *      
+ *      的偏导，然后在每个节点中根据sum值的偏导计算
+ *      
+ *      损失函数对每个权重的偏导，进而调整各维度权重
+ *
+ *  setp:
+ *     
+ *      1. 迭代当前层每一个神经元node[i]
+ *      
+ *      2. 计算激活函数对node[i]加和值sum的偏导ors
+ *      
+ *      3. 计算损失函数对每个神经元的加和值的偏导lrs
+ *      
+ *      4. 将lrs设置到对应神经元中
+ *
+ *      5. 对该神经元调用backward函数
+ *
+ *      6. 计算损失函数对本层输入的偏导保存于rinput_
+ *
+ *  return:
+ *      
+ *      true: 执行成功； false: 执行失败
+ *      
+ ***********************************************************/
+bool BPLayer::backward() {
+    if (!node_ || !routput_ || !rinput_) {
+        return false;
+    }
+    for (int i = 0; i < outputNum_; ++i) {
+        double ors = ractive(node_[i].getSum());
+        double lrs = routput_[i] * ors;
+        node_[i]->setDersum(lrs);
+        if (!node_[i]->backward()) {
+            return false;
+        }
+        for (int j = 0; j < inputNum_; ++j) {
+            if (-1 == node_[i]->rsumI(i)) {
+                return false;
+            }
+            rinput_[i] += lrs * node_[i]->rsumI(i);
+        }
+    }
+    return true;
+}
+
+/***********************************************************
+ *
+ *  Summary: 
+ *
+ *      前向函数，使本网络的所有层次的依次forward
+ *
+ *  setp:
+ *     
+ *      1. 将第一层的输入设置为本网络的输入
+ *      
+ *      2. 执行第一层的forward
+ *      
+ *      3. 迭代后续各层，每一层的输入设置为前一层的输出
+ *      
+ *      4. 为每一层调用forward
+ *
+ *      5. 将最后一层的输出设置为网络的输出
+ *
+ *  return:
+ *      
+ *      true: 执行成功； false: 执行失败
+ *      
+ ***********************************************************/
 bool BPNet::forward() {
     lay_[0]->input_ = input_;
+    if (!lay_[0]->forward()) {
+        return false;
+    }
     for (int i = 1; i < layNum_; ++i) {
         lay_[i]->input_ = lay_[i-1]->input_;
-        lay_[i]->forward();
+        if !lay_[i]->forward()) {
+            return false;
+        }
     }
     for (int i = 0; i < outputNum_; ++i) {
         output_[i] = lay_[layNum_-1]->output_[i];
     }
+    return true;
 }
 
 void BPNode::countWeight(double der) {
@@ -329,15 +356,7 @@ void BPNode::countWeight(double der) {
     }
 }
 
-bool BPLayer::backward() {
-    for (int i = 0; i < outputNum_; ++i) {
-        double derS = routput_[i]*derivativeActiation(); // TODO
-        node_[i]->countWeight(derS);
-        for (int j = 0; j < inputNum_; ++j) {
-            rinput_[i] += derS * node_[i]->derivativeAdditiveI(i);
-        }
-    }
-}
+
 
 bool BPNet::backward() {
     lay_[layNum_-1].routput_ = routput_;

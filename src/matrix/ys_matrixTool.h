@@ -21,7 +21,9 @@ public:
 
 /*******************************************************************************
  *
- *  Summary: 计算矩阵A和矩阵B的加和，矩阵A和矩阵B必须行数列数相同
+ *  Summary: 
+ *
+ *      计算矩阵A和矩阵B的加和，矩阵A和矩阵B必须行数列数相同
  *
  *  Parameters:
  *
@@ -29,7 +31,9 @@ public:
  *
  *      const Matrix<T>& B : 矩阵B
  *
- *  Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放 
+ *  Return : 
+ *
+ *      返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放 
  *
  *******************************************************************************/
 template <typename T>
@@ -48,7 +52,9 @@ DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
 
 /*******************************************************************************
  *
- *  Summary: 计算矩阵A和矩阵B的加和，通过传出参数C传出
+ *  Summary: 
+ *      
+ *      计算矩阵A和矩阵B的加和，通过传出参数C传出
  *
  *  Parameters:
  *
@@ -58,7 +64,9 @@ DMatrix<T>* Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B) {
  *
  *      DMatrix<T>& C : 矩阵C，传出A+B的结果
  *
- *  Return : 没有返回值，通过传出参数C传出
+ *  Return : 
+ *
+ *      没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
@@ -76,7 +84,9 @@ void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
 
 /*******************************************************************************
  *
- *  Summary: 计算矩阵A和矩阵B的乘机，矩阵A的列数必须等于矩阵B的行数
+ *  Summary: 
+ *
+ *      计算矩阵A和矩阵B的乘机，矩阵A的列数必须等于矩阵B的行数
  *
  *  Parameters:
  *
@@ -84,7 +94,9 @@ void Matrixs<T>::add(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
  *
  *      const Matrix<T>& B : 矩阵B
  *
- *  Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
+ *  Return : 
+ *
+ *      返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
  *
  *******************************************************************************/
 template <typename T>
@@ -106,7 +118,9 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
 
 /*******************************************************************************
  *
- *  Summary: 矩阵A和矩阵B相乘，结果通过传出参数矩阵C传出
+ *  Summary: 
+ *
+ *      矩阵A和矩阵B相乘，结果通过传出参数矩阵C传出
  *
  *  Parameters:
  *
@@ -116,7 +130,9 @@ DMatrix<T>* Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B) {
  *
  *      DMatrix<T>& C : 传出参数矩阵C
  *
- *  Return : 没有返回值，通过传出参数C传出
+ *  Return : 
+ *
+ *      没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
@@ -137,15 +153,19 @@ void Matrixs<T>::mul(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
 
 /*******************************************************************************
  *
- *Summary: 计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
+ *  Summary: 
+ *  
+ *      计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
  *
- *Parameters:
+ *  Parameters:
  *
- *   const Matrix<T>& A : 矩阵A    
+ *      const Matrix<T>& A : 矩阵A    
  *
- *   const Matrix<T>& B : 矩阵B
+ *      const Matrix<T>& B : 矩阵B
  *
- *Return : 返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
+ *  Return : 
+ *
+ *      返回指向结果矩阵的指针，该指针由本函数申请，但必须有调用函数释放
  *
  *******************************************************************************/
 template <typename T>

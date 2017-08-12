@@ -152,7 +152,6 @@ inline T* DMatrix<T>::operator() (uint x) {
     return value_[x];
 }
 
-
 template <typename T>
 inline const T* DMatrix<T>::operator[] (uint x) const{
     return value_[x];
