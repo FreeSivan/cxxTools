@@ -364,16 +364,6 @@ double ractive(double value) {
     return 1;
 }
 
-int layNum_;        // 神经网络层数
-int inputNum_;      // 神经网络输入维度
-int outputNum_;     // 神经网络输出维度
-double *input_;     // 神经网络的输入
-double *output_;    // 神经网络的输出
-double *routput_;   // 损失函数对输出的偏导值
-BPLayer **lay_;     // 节点层的数组
-double lRate_;      // 神经网络学习率
-double rRate_;      // 神经网络正则率
-
 /***********************************************************
  *
  *  Summary: 
