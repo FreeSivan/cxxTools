@@ -30,18 +30,18 @@ protected:
 protected:
     virtual bool trainImpl(int index) = 0;
 protected:
-    int trainThr_;          //default 100000
-    int factorNum_;         //default 100
-    double errThr_;         //default 0.01
-    double regRate_;        //default 0.2
-    double learnRate_;      //default 0.1
-    DMatrix<double> r_;     //Training data
-    DMatrix<double> r1_;    //Matrix p*q
-    DMatrix<double> p_;     //Result matrix p
-    DMatrix<double> q_;     //Result matrix q
-    char rfileName_[MAX_NAME_LEN];
-    char pfileName_[MAX_NAME_LEN];
-    char qfileName_[MAX_NAME_LEN];
+    int trainThr_;					// 训练最大次数
+    int factorNum_;					// 隐参数数目
+    double errThr_;					// 错误率阈值
+    double regRate_;				// 正则率
+    double learnRate_;				// 学习率
+    DMatrix<double> r_;				// 初始矩阵
+    DMatrix<double> r1_;			// p_*q_结果
+    DMatrix<double> p_;				// 结果矩阵p
+    DMatrix<double> q_;				// 结果矩阵q
+    char rfileName_[MAX_NAME_LEN];	// r_矩阵数据文件名
+    char pfileName_[MAX_NAME_LEN];	// p_矩阵数据文件名
+    char qfileName_[MAX_NAME_LEN];	// q_矩阵数据文件名
 };
 
 class GDMsTrainer : public MsTrainer {

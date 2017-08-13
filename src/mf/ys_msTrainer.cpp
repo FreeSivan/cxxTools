@@ -5,6 +5,11 @@
 
 double ran_uniform();
 namespace ys {
+/****************************************************************
+ *
+ *	Summary: 初始化默认参数，分配初始资源
+ *
+ ***************************************************************/
 MsTrainer::MsTrainer() {
     trainThr_ = 100000;
     factorNum_ = 10;
@@ -19,6 +24,11 @@ MsTrainer::MsTrainer() {
     qfileName_[sizeof("qfile")] = 0;
 }
 
+/****************************************************************
+ *
+ *	Summary: 从指定文件中加载r_的结果到内存
+ *
+ ***************************************************************/
 bool MsTrainer::load(char *path) {
     char fullpath[1024] = {0};
     sprintf (fullpath, "%s/%s", path, rfileName_);
@@ -38,6 +48,11 @@ bool MsTrainer::load(char *path) {
     return true;
 }
 
+/****************************************************************
+ *
+ *	Summary: 保存q_和p_的结果到指定文件中
+ *
+ ***************************************************************/
 bool MsTrainer::save(char *path) {
     char fullpath[1024] = {0};
     sprintf (fullpath, "%s/%s", path, pfileName_);
@@ -46,69 +61,48 @@ bool MsTrainer::save(char *path) {
     bool ret2 = q_.save(fullpath);
     return (ret1 && ret2);
 }
-/*
- *Summary: Sets the min error threshold for the 
- *         end of training 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置最小误差阈值，作为训练结束条件
  *
- *   double errThr : min error threshold
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setErrThr(double errThr) {
     errThr_ = errThr;
 }
 
 
-/*
- *Summary: Sets the learning rate of the model 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置正则率，正则函数的权重
  *
- *   double learnRate : learing rate of the model
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setLRate(double learnRate) {
     learnRate_ = learnRate;
 }
 
-/*
- *Summary: Set the maximum training times of the model 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置训练最大次数
  *
- *   int trainThr : the maximum training times
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setTrainThr(int trainThr) {
     trainThr_ = trainThr;
 }
 
-/*
- *Summary: Sets the number of hidden factors 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置隐藏参数数目
  *
- *   int factorNum : the number of hidden factors
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setFactorNum(int factorNum) {
     factorNum_ = factorNum;
 }
 
-/*
- *Summary: set the file to save p matrix 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置p矩阵存储文件名
  *
- *   char *pfileName : file name 
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setPFileName(char *pfileName) {
     int len = strlen(pfileName);
     if (len >= MAX_NAME_LEN) {
@@ -118,15 +112,11 @@ void MsTrainer::setPFileName(char *pfileName) {
     pfileName_[len] = 0;
 }
 
-/*
- *Summary: set the file to save q matrix 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置q矩阵存储文件名
  *
- *   char *qfileName : file name 
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setQFileName(char *qfileName) {
     int len = strlen(qfileName);
     if (len >= MAX_NAME_LEN) {
@@ -136,15 +126,11 @@ void MsTrainer::setQFileName(char *qfileName) {
     qfileName_[len] = 0;
 }
 
-/*
- *Summary: set the file to save r matrix 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 设置r矩阵存储文件名
  *
- *   char *rfileName : file name 
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::setRFileName(char* rfileName) {
     int len = strlen(rfileName);
     if (len >= MAX_NAME_LEN) {
@@ -154,15 +140,11 @@ void MsTrainer::setRFileName(char* rfileName) {
     rfileName_[len] = 0;
 }
 
-/*
- *Summary: set the file to save r matrix 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 训练函数，循环调用trainImpl，直至结束
  *
- *   char *rfileName : file name 
- *
- *Return : no return 
- */
+ ***************************************************************/
 void MsTrainer::train() {
     r1_.setSize(r_.getDimX(), r_.getDimY());
     int trainNum = 0;
@@ -174,6 +156,11 @@ void MsTrainer::train() {
     }
 }
 
+/****************************************************************
+ *
+ *	Summary: 误差函数，计算两个矩阵的标准差
+ *
+ ***************************************************************/
 double MsTrainer::deviationFunction() {
     if (r_.getDimX() != r1_.getDimX() || 
         r_.getDimY() != r1_.getDimY()) {
@@ -193,18 +180,27 @@ double MsTrainer::deviationFunction() {
     return sqrt(sum / count);
 }
 
-/*
- *Summary: Calculate the gradient value of p[i][m] 
- *         about the error function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int i : dimX of matrix p
- *   int m : dimY of matrix p
+ *		标准梯度下降的损失函数对p_[i][m]的导函数，标准梯度下降的
+ *	
+ *		损失函数是所有样本在模型的输出和样本输出的差的平方和，以
  *
- *Return : the gradient value of p[i][m] about the 
- *         error function 
- */
+ *		这个函数对p[i][m]的导函数在该点的导数值
+ *
+ *	Parameters:
+ *
+ *		int i : 当前要更新的参数p_[i][m]的x下标
+ *
+ *		int m : 当前要更新的参数p_[i][m]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在p_[i][m]点处的导数值
+ *
+ ***************************************************************/
 double GDMsTrainer::lossFuncP(int i, int m) {
     double thita = 0;
     int count = 0;
@@ -221,18 +217,27 @@ double GDMsTrainer::lossFuncP(int i, int m) {
     return thita / count;
 }
 
-/*
- *Summary: Calculate the gradient value of q[m][j] 
- *         about the error function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int m : dimX of matrix q
- *   int j : dimY of matrix q
+ *		标准梯度下降的损失函数对q_[m][j]的导函数，标准梯度下降的
+ *	
+ *		损失函数是所有样本在模型的输出和样本输出的差的平方和，以
  *
- *Return : the gradient value of q[m][j] about the 
- *         error function 
- */
+ *		这个函数对q_[m][j]的导函数在该点的导数值
+ *	
+ *	Parameters:
+ *
+ *		int m : 当前要更新的参数q_[m][j]的x下标
+ *
+ *		int j : 当前要更新的参数q_[m][j]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在q_[m][j]点处的导数值
+ *
+ ***************************************************************/
 double GDMsTrainer::lossFuncQ(int m, int j) {
     double thita = 0;
     int count = 0;
@@ -249,47 +254,83 @@ double GDMsTrainer::lossFuncQ(int m, int j) {
     return thita / count;
 }
 
-/*
- *Summary: Calculate the gradient value of p[i][m] 
- *         about the regular function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int i : dimX of matrix p
- *   int m : dimY of matrix p
+ *		正则函数对p_[i][m]的导函数，正则函数是为了防止过拟合而
+ *	
+ *		拟定的和损失函数一起对参数求梯度，和损失函数对参数的偏
  *
- *Return : the gradient value of p[i][m] about the 
- *         regular function 
- */
+ *		导一样，一起参与参数的迭代更新
+ *	
+ *	Parameters:
+ *
+ *		int i : 当前要更新的参数p_[i][m]的x下标
+ *
+ *		int m : 当前要更新的参数p_[i][m]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在p_[i][m]点处的导数值
+ *
+ ***************************************************************/
 double GDMsTrainer::regularFuncP(int i, int m) {
     return 0;
 }
 
-/*
- *Summary: Calculate the gradient value of q[i][m] 
- *         about the regular function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int m : dimX of matrix q
- *   int j : dimY of matrix q
+ *		正则函数对q_[m][j]的导函数，正则函数是为了防止过拟合而
+ *	
+ *		拟定的和损失函数一起对参数求梯度，和损失函数对参数的偏
  *
- *Return : the gradient value of q[i][m] about the 
- *         error function 
- */
+ *		导一样，一起参与参数的迭代更新
+ *	
+ *	Parameters:
+ *
+ *		int m : 当前要更新的参数q_[m][j]的x下标
+ *
+ *		int j : 当前要更新的参数q_[m][j]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在q_[m][j]点处的导数值
+ *
+ ***************************************************************/
 double GDMsTrainer::regularFuncQ(int m, int j) {
     return 0;
 }
 
-/*
- *Summary: use standard gradient descent to train model
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int index : the current round of training
+ *		执行标准梯度下降一轮训练，迭代q_,p_矩阵中的值
+ *	
+ *	step:
  *
- *Return : true : training over; false : training continue
- */
+ *		1. 根据矩阵p_，q_当前值，计算当前轮次r1_的值
+ *
+ *		2. 判断r1_和r_的当前无差，若小于阈值则返回
+ *
+ *		3. 迭代每个隐性因子m，更新每个p[i][m]和q[m][j]
+ *
+ *		4. 对于每个p_[i][m]，根据损失梯度和正则梯度更新
+ *
+ *		5. 对于每个q_[m][m]，根据损失梯度和正则梯度更新
+ *	
+ *	Parameters:
+ *
+ *		int index : 当前训练轮次
+ *
+ *	return:
+ *
+ *		损失函数的导函数在q_[m][j]点处的导数值
+ *
+ ***************************************************************/
 bool GDMsTrainer::trainImpl(int index) {
     for (int i = 0; i < r_.getDimX(); ++i) {
     for (int j = 0; j < r_.getDimY(); ++j) {
@@ -299,10 +340,8 @@ bool GDMsTrainer::trainImpl(int index) {
         r1_[i][j] = Matrixs<double>::mulLine(p_, q_, i, j);
     }
     }
-    if (!(index % 100)) {
-        if (deviationFunction() < errThr_) {
-            return true;
-        }
+    if (deviationFunction() < errThr_) {
+		return true;
     }
     for (int m = 0; m < factorNum_; ++m) {
         for (int i = 0; i < p_.getDimX(); ++i) {
@@ -319,81 +358,137 @@ bool GDMsTrainer::trainImpl(int index) {
     return false;
 }
 
-/*
- *Summary: Calculate the gradient value of p[i][m] 
- *         about the SDT error function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int i : dimX of matrix p
- *   int m : dimY of matrix p
- *   int j : dimY of matrix r
+ *		随机梯度下降的损失函数对p_[i][m]的导函数，随机梯度下降的
+ *	
+ *		损失函数是当前样本在模型的输出和样本输出的差的平方，以这
  *
- *Return : the gradient value of p[i][m] about the 
- *         error function 
- */
+ *		个函数对p[i][m]的导函数在该点的导数值
+ *
+ *	Parameters:
+ *
+ *		int i : 当前样本r_[i][j]的x维度下标
+ *
+ *		int m : 当前训练参数p_[i][m]的y维度下标
+ *
+ *		int j : 当前样本r_[i][j]的y维度下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在p_[i][m]点处的导数值
+ *
+ ***************************************************************/
 double SGDMsTrainer::lossFuncP(int i, int m, int j) {
     return (r_[i][j]-r1_[i][j])*(-q_[m][j]);
 }
 
-/*
- *Summary: Calculate the gradient value of q[m][j] 
- *         about the SDT error function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int m : dimX of matrix q
- *   int j : dimY of matrix q
- *   int i : dimX of matrix r
+ *		随机梯度下降的损失函数对q_[m][j]的导函数，随机梯度下降的
+ *	
+ *		损失函数是当前样本在模型的输出和样本输出的差的平方，以这
  *
- *Return : the gradient value of q[m][j] about the 
- *         error function 
- */
+ *		个函数对q[m][j]的导函数在该点的导数值
+ *
+ *	Parameters:
+ *
+ *		int m : 当前训练参数q_[i][m]的x维度下标
+ *
+ *		int j : 当前样本r_[i][j]的y维度下标
+ *
+ *		int i : 当前样本r_[i][j]的x维度下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在p_[i][m]点处的导数值
+ *
+ ***************************************************************/
 double SGDMsTrainer::lossFuncQ(int m, int j, int i) {
     return (r_[i][j]-r1_[i][j])*(-p_[i][m]);
 }
 
-/*
- *Summary: Calculate the gradient value of p[i][m] 
- *         about the SDT regular function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int i : dimX of matrix p
- *   int m : dimY of matrix p
+ *		正则函数对p_[i][m]的导函数，正则函数是为了防止过拟合而
+ *	
+ *		拟定的和损失函数一起对参数求梯度，和损失函数对参数的偏
  *
- *Return : the gradient value of p[i][m] about the 
- *         regular function 
- */
+ *		导一样，一起参与参数的迭代更新
+ *	
+ *	Parameters:
+ *
+ *		int i : 当前要更新的参数p_[i][m]的x下标
+ *
+ *		int m : 当前要更新的参数p_[i][m]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在p_[i][m]点处的导数值
+ *
+ ***************************************************************/
 double SGDMsTrainer::regularFuncP(int i, int m) {
     return 0;
 }
 
-/*
- *Summary: Calculate the gradient value of q[m][j] 
- *         about the SDT regular function 
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int m : dimX of matrix q
- *   int j : dimY of matrix q
+ *		正则函数对q_[m][j]的导函数，正则函数是为了防止过拟合而
+ *	
+ *		拟定的和损失函数一起对参数求梯度，和损失函数对参数的偏
  *
- *Return : the gradient value of q[m][j] about the 
- *         regular function 
- */
+ *		导一样，一起参与参数的迭代更新
+ *	
+ *	Parameters:
+ *
+ *		int m : 当前要更新的参数q_[m][j]的x下标
+ *
+ *		int j : 当前要更新的参数q_[m][j]的y下标
+ *	
+ *	return:
+ *
+ *		损失函数的导函数在q_[m][j]点处的导数值
+ *
+ ***************************************************************/
 double SGDMsTrainer::regularFuncQ(int m, int j) {
     return 0;
 }
 
-/*
- *Summary: use Stochastic gradient descent to train model
+/****************************************************************
  *
- *Parameters:
+ *	Summary: 
  *
- *   int index : the current round of training
+ *		执行随机梯度下降一轮训练，迭代q_,p_矩阵中的值
+ *	
+ *	step:
  *
- *Return : true : training over; false : training continue
- */
+ *		1. 迭代r_的每个值r_[i][j]，如果r_[i][j]为0则跳过
+ *
+ *		2. 根据当前p_,q_矩阵的值计算r1_[i][j]
+ *
+ *		3. 迭代每个隐性因子m，更新每个p[i][m]和q[m][j]
+ *
+ *		4. 对于每个p_[i][m]，根据损失梯度和正则梯度更新
+ *
+ *		5. 对于每个q_[m][m]，根据损失梯度和正则梯度更新
+ *	
+ *	Parameters:
+ *
+ *		int index : 当前训练轮次
+ *
+ *	return:
+ *
+ *		损失函数的导函数在q_[m][j]点处的导数值
+ *
+ ***************************************************************/
 bool SGDMsTrainer::trainImpl(int index) {
     printf ("index = %d\n", index);
     for (int i = 0; i < p_.getDimX(); ++i) {

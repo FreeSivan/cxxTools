@@ -184,17 +184,17 @@ DMatrix<T>* Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B) {
 
 /*******************************************************************************
  *
- *Summary: 计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
+ *	Summary: 计算矩阵A和矩阵B的差值，矩阵A和矩阵B必须行数列数相同
  *
- *Parameters:
+ *	Parameters:
  *
- *   const Matrix<T>& A : 矩阵A   
+ *		const Matrix<T>& A : 矩阵A   
  *
- *   const Matrix<T>& B : 矩阵B
+ * 		const Matrix<T>& B : 矩阵B
  *
- *   DMatrix<T>& C : 传出参数矩阵C
+ *		DMatrix<T>& C : 传出参数矩阵C
  *
- *Return : 没有返回值，通过传出参数C传出
+ *	Return : 没有返回值，通过传出参数C传出
  *
  *******************************************************************************/
 template <typename T>
@@ -212,15 +212,15 @@ void Matrixs<T>::sub(const DMatrix<T>& A, const DMatrix<T>& B, DMatrix<T>& C) {
 
 /*******************************************************************************
  *
- *Summary: 计算矩阵A的r行和矩阵B的c列的乘积
+ *	Summary: 计算矩阵A的r行和矩阵B的c列的乘积
  *
- *Parameters:
+ *	Parameters:
  *
- *   const Matrix<T>& A : 矩阵A   
+ *		const Matrix<T>& A : 矩阵A   
  *
- *   const Matrix<T>& B : 矩阵B
+ *		const Matrix<T>& B : 矩阵B
  *
- *Return : 矩阵A的r行和矩阵B的c列的乘积值
+ *	Return : 矩阵A的r行和矩阵B的c列的乘积值
  *
  *******************************************************************************/
 template <typename T>
@@ -238,15 +238,15 @@ T Matrixs<T>::mulLine(const DMatrix<T>& A, const DMatrix<T>& B, int r, int c) {
 
 /*******************************************************************************
  *
- *Summary: 计算矩阵A和B的均方差
+ *	Summary: 计算矩阵A和B的均方差
  *
- *Parameters:
+ *	Parameters:
  *
- *   const Matrix<T>& A : 矩阵A   
+ *		const Matrix<T>& A : 矩阵A   
  *
- *   const Matrix<T>& B : 矩阵B
+ *		const Matrix<T>& B : 矩阵B
  *
- *Return : 均方差的值
+ *	Return : 均方差的值
  *
  *******************************************************************************/
 template <typename T>
